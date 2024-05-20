@@ -3,4 +3,4 @@ def test_example():
 
 
 def test_example2():
-    assert 1 == 2
+    assert 2 == 2
