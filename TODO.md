@@ -10,4 +10,4 @@
 * `[objective 2]`: build a generative model (VAE, VQ-VAE) that generates an image (no necessarily in the next time step) [](**GEN Team**)
 * `[objective 2]`: create dataset for generative model [] (**GEN Team**)
 * `[objective 2]`: create loader for generative model [] (**GEN Team**)
-* `[objective 3]`: write data assimilation class `class DA(model, sensor, R, B)` OR `class DA(model, model_data, sensor_data, R, B)` [] (**GEN Team**)
+* `[objective 3]`: write data assimilation class `class DA(model, sensor, R, B)` OR `class DA(model, model_data, sensor_data, R, B)` [] (**Xuan**) 
