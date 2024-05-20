@@ -1,9 +1,12 @@
 ### ATLAS Project TODO list:
 
-* `[objective 1]`: build a sequential forecasting model (LSTM, RNN, ConvLSTM) that takes in image at time t and forecasts t+1(name) [] (**LSTM Team**)
-* `[objective 1]`: create dataset for forecast model [] (**LSTM Team**)
-* `[objective 1]`: create loader for forecast model [] (**LSTM Team**)
-* `[objective 1]`: Split data into separate fires fires (labeled) [] (**LSTM Team**)
+* `[objective 1]`: build a sequential forecasting model (LSTM, RNN, ConvLSTM) that takes in image at time t and forecasts t+1(name) [x] (**LSTM Team**)
+* `[objective 1]`: create dataset for forecast model [x] (**LSTM Team**)
+* `[objective 1]`: create loader for forecast model [] (**LSTM Team**) 
+* `[objective 1]`: handle outliner fires fires (labeled) [x] (**LSTM Team**)
+* `[objective 1]`: package task 1 tools including model structure, model training, evaluation.[] (**LSTM Team**)
+* `[objective 1]`: showcase package tools [] (**LSTM Team**)
+
 
 
 
