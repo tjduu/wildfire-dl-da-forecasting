@@ -1,11 +1,13 @@
 """
-This module contains functions and utilities for training and validating generative Variational Autoencoder (VAE) models.
+This module contains functions and utilities for training and validating
+generative Variational Autoencoder (VAE) models.
 
 Functions:
     train: Trains the model for one epoch.
     validate: Validates the model.
     save_checkpoint: Saves the model checkpoint.
-    train_vae: Trains the VAE model over multiple epochs, validates it, and saves checkpoints.
+    train_vae: Trains the VAE model over multiple epochs, validates it,
+                and saves checkpoints.
 """
 
 import torch
@@ -30,15 +32,18 @@ def train(
     Args:
         model (torch.nn.Module): The model to train.
         device (str): Device to perform computations on.
-        data_loader (torch.utils.data.DataLoader): DataLoader providing the training data.
-        optimizer (torch.optim.Optimizer): Optimizer for updating the model parameters.
+        data_loader (torch.utils.data.DataLoader): DataLoader providing the
+                                                        training data.
+        optimizer (torch.optim.Optimizer): Optimizer for updating the model
+                                                parameters.
         tepoch (tqdm.tqdm): tqdm progress bar object.
         curr_epoch (int): Current epoch number.
         n_epochs (int): Total number of epochs.
         logs (bool, optional): Whether to log the progress. Defaults to True.
 
     Returns:
-        tuple: Average training loss, mean squared error, and KL divergence over the dataset.
+        tuple: Average training loss, mean squared error, and KL divergence
+        over the dataset.
     """
     model.train()
     train_loss, mse_loss, kl_loss = 0, 0, 0
@@ -79,11 +84,13 @@ def validate(model, data_loader, device):
 
     Args:
         model (torch.nn.Module): The model to validate.
-        data_loader (torch.utils.data.DataLoader): DataLoader providing the validation data.
+        data_loader (torch.utils.data.DataLoader): DataLoader providing the
+                                                    validation data.
         device (str): Device to perform computations on.
 
     Returns:
-        tuple: Average validation loss, mean squared error, and KL divergence over the dataset.
+        tuple: Average validation loss, mean squared error, and KL divergence
+                over the dataset.
     """
     model.eval()
     val_loss, mse_loss, kl_loss = 0, 0, 0
@@ -151,12 +158,17 @@ def train_vae(
     Args:
         n_epochs (int): Number of epochs to train.
         model (torch.nn.Module): The VAE model to train.
-        optimizer (torch.optim.Optimizer): Optimizer for updating the model parameters.
-        scheduler (torch.optim.lr_scheduler, optional): Learning rate scheduler.
-        train_loader (torch.utils.data.DataLoader): DataLoader providing the training data.
-        val_loader (torch.utils.data.DataLoader, optional): DataLoader providing the validation data.
+        optimizer (torch.optim.Optimizer): Optimizer for updating the model
+                                                parameters.
+        scheduler (torch.optim.lr_scheduler, optional): Learning rate
+                                                        scheduler.
+        train_loader (torch.utils.data.DataLoader): DataLoader providing the
+                                                    training data.
+        val_loader (torch.utils.data.DataLoader, optional): DataLoader
+                                            providing the validation data.
         model_save_path (str, optional): Path to save the model checkpoints.
-        use_liveloss (bool, optional): Whether to use livelossplot for logging. Defaults to False.
+        use_liveloss (bool, optional): Whether to use livelossplot for logging.
+                                        Defaults to False.
         device (str): Device to perform computations on.
 
     Returns:

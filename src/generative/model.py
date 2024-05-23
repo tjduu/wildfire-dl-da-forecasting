@@ -1,5 +1,7 @@
 """
-This module contains classes and functions for training and evaluating Variational Autoencoders (VAE) and Convolutional Variational Autoencoders (CVAE).
+This module contains classes and functions for training and evaluating
+Variational Autoencoders (VAE) and Convolutional Variational Autoencoders
+(CVAE).
 
 Classes:
     VAE: Defines a basic Variational Autoencoder.
@@ -24,10 +26,12 @@ class VAE(nn.Module):
     Variational Autoencoder (VAE) class.
 
     Args:
-        input_image_dims (tuple): Dimensions of the input images (channels, height, width).
+        input_image_dims (tuple): Dimensions of the input images
+                                    (channels, height, width).
         latent_dims (int): Dimension of the latent space.
         hidden_layers (list): List of hidden layer sizes.
-        activation (nn.Module, optional): Activation function to use. Defaults to nn.ReLU.
+        activation (nn.Module, optional): Activation function to use.
+                                            Defaults to nn.ReLU.
         device (str, optional): Device to run the model on. Defaults to 'cpu'.
     """
 
@@ -143,12 +147,14 @@ class GridSearchVAE:
     Grid search for finding the best VAE model parameters.
 
     Args:
-        input_image_dims (tuple): Dimensions of the input images (channels, height, width).
+        input_image_dims (tuple): Dimensions of the input images
+                                (channels, height, width).
         hidden_layers (list): List of hidden layer sizes.
         latent_dims (list): List of latent dimensionalities to search.
         lrs (list): List of learning rates to search.
         batch_sizes (list): List of batch sizes to search.
-        epochs (int, optional): Number of epochs to train each model. Defaults to 10.
+        epochs (int, optional): Number of epochs to train each model.
+                                Defaults to 10.
         device (str, optional): Device to run the models on. Defaults to 'cpu'.
     """
 
@@ -199,7 +205,9 @@ class GridSearchVAE:
             train_loader = DataLoader(
                 train_dataset, batch_size=batch_size, shuffle=True
             )
-            val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+            val_loader = DataLoader(val_dataset,
+                                    batch_size=batch_size,
+                                    shuffle=False)
 
             # reinstantiate model with new combination of params.
             model = VAE(
@@ -210,7 +218,9 @@ class GridSearchVAE:
                 device=self.device,
             ).to(self.device)
 
-            optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=False)
+            optimizer = torch.optim.Adam(model.parameters(),
+                                         lr=lr,
+                                         amsgrad=False)
 
             train_losses, val_losses = [], []
             for i in range(self.epochs):
@@ -238,8 +248,11 @@ class GridSearchVAE:
                     val_losses.append(_val_losses[0])
 
             # store all results (and set best model if needed.).
-            # naively taking the min of the training loss, would be worth testing taking and average of the val and the train.
-            # based on all the previous experiments, the FNN-VAE is not overfitting and so the min MSE is an indication for the best model given num epochs.
+            # naively taking the min of the training loss, would be worth
+            # testing taking and average of the val and the train.
+            # based on all the previous experiments, the FNN-VAE is not
+            # overfitting and so the min MSE is an indication for the best
+            # model given num epochs.
             min_training_loss = np.min(train_losses)
             min_validation_loss = np.min(val_losses)
 
@@ -313,7 +326,8 @@ class CVAE(nn.Module):
     Convolutional Variational Autoencoder (CVAE) class.
 
     Args:
-        input_image_dims (tuple): Dimensions of the input images (channels, height, width).
+        input_image_dims (tuple): Dimensions of the input images
+                                    (channels, height, width).
         latent_dims (int): Dimensionality of the latent space.
         device (str): Device to run the model on.
         kernel_sizes (list): List of kernel sizes for convolutional layers.

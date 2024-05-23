@@ -1,5 +1,7 @@
 """
-This module contains classes for decompressing data for data assimilation using different models, such as Variational Autoencoders (VAE) and Principal Component Analysis (PCA).
+This module contains classes for decompressing data for data assimilation
+using different models, such as Variational Autoencoders (VAE) and Principal
+Component Analysis (PCA).
 
 Example usage:
     autoencoder = VAE(input_image_dims=(1, 256, 256),
@@ -9,7 +11,9 @@ Example usage:
                       latent_dims=16,
                       device=DEVICE).to(DEVICE)
 
-    vae_test = VAEDecompressor(model_obj=autoencoder, model_path="model_test.pt", device=DEVICE)
+    vae_test = VAEDecompressor(model_obj=autoencoder,
+                                model_path="model_test.pt",
+                                device=DEVICE)
     A = vae_test.encode(x=torch.randn(1, 256*256))
     B = vae_test.decode(x=torch.randn(1, 16))
 
@@ -61,7 +65,8 @@ class VAEDecompressor(Decompressor):
         device (str): Device to load the model on ('cpu' or 'cuda').
 
     Methods:
-        load_model(model_path, model_obj, device): Load the VAE model from the specified path.
+        load_model(model_path, model_obj, device): Load the VAE model from the
+        specified path.
         encode(x): Encode the input data using the VAE.
         decode(x): Decode the encoded data using the VAE.
     """
@@ -89,7 +94,8 @@ class VAEDecompressor(Decompressor):
             torch.nn.Module: Loaded VAE model.
         """
         try:
-            model_state = torch.load(model_path, map_location=torch.device(device))
+            model_state = torch.load(model_path,
+                                     map_location=torch.device(device))
             model_obj.load_state_dict(model_state["model_state_dict"])
             model_obj.to(device)
             model_obj.eval()
@@ -97,7 +103,7 @@ class VAEDecompressor(Decompressor):
             return model_obj
 
         except KeyError:
-            raise ValueError("Model state dict key not found in the loaded model file")
+            raise ValueError("Model state dict key not found in the model")
 
     def encode(self, x):
         """
@@ -178,4 +184,3 @@ class PCADecompressor(Decompressor):
             numpy.ndarray: Decoded data array.
         """
         return self.model.inverse_transform(x)
-

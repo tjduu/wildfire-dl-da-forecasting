@@ -1,8 +1,10 @@
 """
-This module contains a custom Dataset class for handling wildfire images with transformations.
+This module contains a custom Dataset class for handling wildfire images with
+transformations.
 
 Classes:
-    WildfireImageDataSet: A custom Dataset for loading and transforming wildfire images.
+    WildfireImageDataSet: A custom Dataset for loading and transforming
+    wildfire images.
 """
 
 import torch
@@ -18,7 +20,8 @@ class WildfireImageDataSet(Dataset):
         transform (callable): A function/transform to apply to the images.
 
     Methods:
-        __getitem__(idx): Get raw data using idx and apply transforms to output a processed image tensor.
+        __getitem__(idx): Get raw data using idx and apply transforms to
+        output a processed image tensor.
         __len__(): Return the total number of images in the dataset.
     """
     def __init__(self, data, transform):
@@ -32,7 +35,8 @@ class WildfireImageDataSet(Dataset):
         self.transform = transform
 
     def __getitem__(self, idx):
-        """Get raw data using idx and apply transforms to output a processed image tensor.
+        """Get raw data using idx and apply transforms to output a processed
+        image tensor.
 
         Args:
             idx (int): Index of the image to retrieve.
