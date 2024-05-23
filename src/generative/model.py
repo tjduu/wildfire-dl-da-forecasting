@@ -1,4 +1,14 @@
-""""""
+"""
+This module contains classes and functions for training and evaluating
+Variational Autoencoders (VAE) and Convolutional Variational Autoencoders
+(CVAE).
+
+Classes:
+    VAE: Defines a basic Variational Autoencoder.
+    GridSearchVAE: Performs grid search to find the best VAE model.
+    Reshape: Utility module to reshape tensors.
+    CVAE: Defines a Convolutional Variational Autoencoder.
+"""
 
 import torch
 import torch.nn as nn
@@ -12,6 +22,19 @@ from tqdm import tqdm
 
 
 class VAE(nn.Module):
+    """
+    Variational Autoencoder (VAE) class.
+
+    Args:
+        input_image_dims (tuple): Dimensions of the input images
+                                    (channels, height, width).
+        latent_dims (int): Dimension of the latent space.
+        hidden_layers (list): List of hidden layer sizes.
+        activation (nn.Module, optional): Activation function to use.
+                                            Defaults to nn.ReLU.
+        device (str, optional): Device to run the model on. Defaults to 'cpu'.
+    """
+
     def __init__(
         self,
         input_image_dims,
@@ -56,22 +79,55 @@ class VAE(nn.Module):
         self.decoder = nn.Sequential(*modules)
 
     def encode(self, x):
-        """"""
+        """
+        Encodes the input into the latent space using the VAE.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Encoded tensor.
+        """
         return self.encoder(x)
 
     def decode(self, x):
-        """"""
+        """
+        Decodes the latent representation back into the input space.
+
+        Args:
+            x (torch.Tensor): Latent representation tensor.
+
+        Returns:
+            torch.Tensor: Decoded tensor.
+        """
         return self.decoder(x)
 
     def sample_latent_space(self, mu, logvar):
-        """"""
+        """
+        Samples from the latent space.
+
+        Args:
+            mu (torch.Tensor): Mean of the latent space.
+            logvar (torch.Tensor): Log variance of the latent space.
+
+        Returns:
+            tuple: Sampled latent vector and KL divergence.
+        """
         sigma = torch.exp(0.5 * logvar)  # stability trick.
         z = mu + sigma * self.distribution.sample(mu.shape).to(self.device)
         kl_div = (sigma**2 + mu**2 - torch.log(sigma) - 0.5).sum()
         return z, kl_div
 
     def forward(self, x):
-        """"""
+        """
+        Forward pass through the VAE.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            tuple: Reconstructed tensor and KL divergence.
+        """
         encoded = self.encode(x.view(x.size(0), -1))  # make sure its 1D.
 
         # get mu and logvar from latent space.
@@ -87,7 +143,20 @@ class VAE(nn.Module):
 
 
 class GridSearchVAE:
-    """"""
+    """
+    Grid search for finding the best VAE model parameters.
+
+    Args:
+        input_image_dims (tuple): Dimensions of the input images
+                                (channels, height, width).
+        hidden_layers (list): List of hidden layer sizes.
+        latent_dims (list): List of latent dimensionalities to search.
+        lrs (list): List of learning rates to search.
+        batch_sizes (list): List of batch sizes to search.
+        epochs (int, optional): Number of epochs to train each model.
+                                Defaults to 10.
+        device (str, optional): Device to run the models on. Defaults to 'cpu'.
+    """
 
     def __init__(
         self,
@@ -112,7 +181,13 @@ class GridSearchVAE:
         self.num_combinations = None
 
     def fit(self, train_dataset, val_dataset):
-        """"""
+        """
+        Fits the VAE models with different parameter combinations.
+
+        Args:
+            train_dataset (torch.utils.data.Dataset): Training dataset.
+            val_dataset (torch.utils.data.Dataset): Validation dataset.
+        """
         combinations = list(
             itertools.product(
                 self.latent_dims,
@@ -130,7 +205,9 @@ class GridSearchVAE:
             train_loader = DataLoader(
                 train_dataset, batch_size=batch_size, shuffle=True
             )
-            val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+            val_loader = DataLoader(val_dataset,
+                                    batch_size=batch_size,
+                                    shuffle=False)
 
             # reinstantiate model with new combination of params.
             model = VAE(
@@ -141,7 +218,9 @@ class GridSearchVAE:
                 device=self.device,
             ).to(self.device)
 
-            optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=False)
+            optimizer = torch.optim.Adam(model.parameters(),
+                                         lr=lr,
+                                         amsgrad=False)
 
             train_losses, val_losses = [], []
             for i in range(self.epochs):
@@ -169,8 +248,11 @@ class GridSearchVAE:
                     val_losses.append(_val_losses[0])
 
             # store all results (and set best model if needed.).
-            # naively taking the min of the training loss, would be worth testing taking and average of the val and the train.
-            # based on all the previous experiments, the FNN-VAE is not overfitting and so the min MSE is an indication for the best model given num epochs.
+            # naively taking the min of the training loss, would be worth
+            # testing taking and average of the val and the train.
+            # based on all the previous experiments, the FNN-VAE is not
+            # overfitting and so the min MSE is an indication for the best
+            # model given num epochs.
             min_training_loss = np.min(train_losses)
             min_validation_loss = np.min(val_losses)
 
@@ -199,7 +281,9 @@ class GridSearchVAE:
                 self.best_model = model
 
     def plot_results(self):
-        """"""
+        """
+        Plots the results of the grid search to identify best model parameters.
+        """
         fig, ax = plt.subplots(1, 1, figsize=(10, 6))
         latent_dims, batch_sizes, hidden_layers, lrs, train_losses, val_losses = zip(
             *self.results
@@ -222,7 +306,12 @@ class GridSearchVAE:
 
 
 class Reshape(nn.Module):
-    """"""
+    """
+    Utility module to reshape tensors.
+
+    Args:
+        *args: Desired shape of the tensor.
+    """
 
     def __init__(self, *args):
         super().__init__()
@@ -233,7 +322,19 @@ class Reshape(nn.Module):
 
 
 class CVAE(nn.Module):
-    """"""
+    """
+    Convolutional Variational Autoencoder (CVAE) class.
+
+    Args:
+        input_image_dims (tuple): Dimensions of the input images
+                                    (channels, height, width).
+        latent_dims (int): Dimensionality of the latent space.
+        device (str): Device to run the model on.
+        kernel_sizes (list): List of kernel sizes for convolutional layers.
+        filter_sizes (list): List of filter sizes for convolutional layers.
+        h_dim (int): Size of the hidden dimension.
+        pool_size (int, optional): Size of the pooling layers. Defaults to 2.
+    """
 
     def __init__(
         self,
@@ -340,22 +441,55 @@ class CVAE(nn.Module):
         )
 
     def encode(self, x):
-        """"""
+        """
+        Encodes the input into the latent space.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Encoded tensor.
+        """
         return self.encoder(x)
 
     def decode(self, x):
-        """"""
+        """
+        Decodes the latent representation back into the input space.
+
+        Args:
+            x (torch.Tensor): Latent representation tensor.
+
+        Returns:
+            torch.Tensor: Decoded tensor.
+        """
         return self.decoder(x)
 
     def sample_latent_space(self, mu, logvar):
-        """"""
+        """
+        Samples from the latent space.
+
+        Args:
+            mu (torch.Tensor): Mean of the latent space.
+            logvar (torch.Tensor): Log variance of the latent space.
+
+        Returns:
+            tuple: Sampled latent vector and KL divergence.
+        """
         sigma = torch.exp(0.5 * logvar)
         z = mu + sigma * self.distribution.sample(mu.shape).to(self.device)
         kl_div = (sigma**2 + mu**2 - torch.log(sigma) - 0.5).sum()
         return z, kl_div
 
     def forward(self, x):
-        """"""
+        """
+        Forward pass through the CVAE.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            tuple: Reconstructed tensor and KL divergence.
+        """
         encoded = self.encode(x.flatten(start_dim=1))  # make sure its 1D.
 
         # get mu and logvar from latent space.

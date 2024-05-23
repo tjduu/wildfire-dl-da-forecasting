@@ -1,4 +1,14 @@
-""""""
+"""
+This module contains functions and utilities for training and validating
+generative Variational Autoencoder (VAE) models.
+
+Functions:
+    train: Trains the model for one epoch.
+    validate: Validates the model.
+    save_checkpoint: Saves the model checkpoint.
+    train_vae: Trains the VAE model over multiple epochs, validates it,
+                and saves checkpoints.
+"""
 
 import torch
 import torch.nn as nn
@@ -16,7 +26,25 @@ def train(
     n_epochs,
     logs: bool = True,
 ):
-    """Model training."""
+    """
+    Train the model for one epoch.
+
+    Args:
+        model (torch.nn.Module): The model to train.
+        device (str): Device to perform computations on.
+        data_loader (torch.utils.data.DataLoader): DataLoader providing the
+                                                        training data.
+        optimizer (torch.optim.Optimizer): Optimizer for updating the model
+                                                parameters.
+        tepoch (tqdm.tqdm): tqdm progress bar object.
+        curr_epoch (int): Current epoch number.
+        n_epochs (int): Total number of epochs.
+        logs (bool, optional): Whether to log the progress. Defaults to True.
+
+    Returns:
+        tuple: Average training loss, mean squared error, and KL divergence
+        over the dataset.
+    """
     model.train()
     train_loss, mse_loss, kl_loss = 0, 0, 0
     for batch_idx, X in enumerate(data_loader, start=1):
@@ -51,7 +79,19 @@ def train(
 
 
 def validate(model, data_loader, device):
-    """Model validation."""
+    """
+    Validate the model.
+
+    Args:
+        model (torch.nn.Module): The model to validate.
+        data_loader (torch.utils.data.DataLoader): DataLoader providing the
+                                                    validation data.
+        device (str): Device to perform computations on.
+
+    Returns:
+        tuple: Average validation loss, mean squared error, and KL divergence
+                over the dataset.
+    """
     model.eval()
     val_loss, mse_loss, kl_loss = 0, 0, 0
     with torch.no_grad():
@@ -78,7 +118,17 @@ def validate(model, data_loader, device):
 def save_checkpoint(
     model_weights, optimizer_info, model_save_path, epoch, train_loss, val_loss
 ):
-    """"""
+    """
+    Save the model checkpoint.
+
+    Args:
+        model_weights (dict): Model's state dictionary.
+        optimizer_info (dict): Optimizer's state dictionary.
+        model_save_path (str): Path to save the model checkpoint.
+        epoch (int): Current epoch number.
+        train_loss (float): Training loss at the current epoch.
+        val_loss (float): Validation loss at the current epoch.
+    """
     torch.save(
         obj={
             "model_state_dict": model_weights,
@@ -102,7 +152,28 @@ def train_vae(
     use_liveloss,
     device,
 ):
-    """"""
+    """
+    Train the VAE model.
+
+    Args:
+        n_epochs (int): Number of epochs to train.
+        model (torch.nn.Module): The VAE model to train.
+        optimizer (torch.optim.Optimizer): Optimizer for updating the model
+                                                parameters.
+        scheduler (torch.optim.lr_scheduler, optional): Learning rate
+                                                        scheduler.
+        train_loader (torch.utils.data.DataLoader): DataLoader providing the
+                                                    training data.
+        val_loader (torch.utils.data.DataLoader, optional): DataLoader
+                                            providing the validation data.
+        model_save_path (str, optional): Path to save the model checkpoints.
+        use_liveloss (bool, optional): Whether to use livelossplot for logging.
+                                        Defaults to False.
+        device (str): Device to perform computations on.
+
+    Returns:
+        tuple: Trained model, training losses, and validation losses.
+    """
     liveloss = PlotLosses()
 
     train_losses, train_mse_losses, train_kldiv_losses = [], [], []
