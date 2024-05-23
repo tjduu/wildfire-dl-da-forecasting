@@ -205,9 +205,7 @@ class GridSearchVAE:
             train_loader = DataLoader(
                 train_dataset, batch_size=batch_size, shuffle=True
             )
-            val_loader = DataLoader(val_dataset,
-                                    batch_size=batch_size,
-                                    shuffle=False)
+            val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
             # reinstantiate model with new combination of params.
             model = VAE(
@@ -218,9 +216,7 @@ class GridSearchVAE:
                 device=self.device,
             ).to(self.device)
 
-            optimizer = torch.optim.Adam(model.parameters(),
-                                         lr=lr,
-                                         amsgrad=False)
+            optimizer = torch.optim.Adam(model.parameters(), lr=lr, amsgrad=False)
 
             train_losses, val_losses = [], []
             for i in range(self.epochs):

@@ -7,7 +7,6 @@ Functions:
     using a specified model.
 """
 
-
 import matplotlib.pyplot as plt
 import torch
 

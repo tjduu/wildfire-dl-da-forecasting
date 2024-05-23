@@ -24,6 +24,7 @@ class WildfireImageDataSet(Dataset):
         output a processed image tensor.
         __len__(): Return the total number of images in the dataset.
     """
+
     def __init__(self, data, transform):
         """Initialise the dataset with data and transform.
 
