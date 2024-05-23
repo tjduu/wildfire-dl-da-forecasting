@@ -101,14 +101,15 @@ def train_vae(n_epochs, model, optimizer, scheduler, train_loader, val_loader, m
                 logs["val_train loss"] =  _val_losses[0]  # for liveloss.
 
             # save a checkpoint.
-            if (_train_losses[0] <= min(train_losses)):
-                save_checkpoint(model_weights=model.state_dict(),
-                                optimizer_info=optimizer.state_dict(),
-                                model_save_path=model_save_path,
-                                epoch=i,
-                                train_loss=_train_losses[0],
-                                val_loss=_val_losses[0],
-                                )
+            if model_save_path is not None:
+                if (_train_losses[0] <= min(train_losses)):
+                    save_checkpoint(model_weights=model.state_dict(),
+                                    optimizer_info=optimizer.state_dict(),
+                                    model_save_path=model_save_path,
+                                    epoch=i,
+                                    train_loss=_train_losses[0],
+                                    val_loss=_val_losses[0],
+                                    )
             if use_liveloss:
                 liveloss.update(logs)
                 liveloss.send()

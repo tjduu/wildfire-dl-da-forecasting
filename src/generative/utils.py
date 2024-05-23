@@ -86,10 +86,11 @@ def get_device():
     """"""
     device = "cpu"
     if torch.cuda.device_count() > 0 and torch.cuda.is_available():
-        print("Cuda installed! Running on GPU!")
         device = "cuda"
+        print(f"Cuda installed! Running on GPU! (device = {device})")
     else:
-        print("No GPU available!")
+        print(f"No GPU available! (device = {device})")
+    
     return device
 
 

@@ -3,7 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# custom ignore files
 *data/
+*.DS_Store
 
 # C extensions
 *.so
