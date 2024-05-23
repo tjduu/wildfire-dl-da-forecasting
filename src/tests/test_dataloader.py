@@ -6,7 +6,7 @@ from src.forecasting.dataloader import CustomDataset
 
 
 def test_custom_dataset_parameters():
-    test_data_path = "data/test_forecasting_dataset.npy"
+    test_data_path = "/tests/data/test_forecasting_dataset.npy"
     dataset = CustomDataset(data_file=test_data_path, sequence_length=4, step=1)
 
     assert str(test_data_path).endswith(".npy")
@@ -16,7 +16,7 @@ def test_custom_dataset_parameters():
 
 
 def test_custom_dataset_getitem_method():
-    test_data_path = "data/test_forecasting_dataset.npy"
+    test_data_path = "src/tests/data/test_forecasting_dataset.npy"
     dataset = CustomDataset(data_file=test_data_path, sequence_length=4, step=1)
     actual_x, actual_y = dataset.__getitem__(0)
 
