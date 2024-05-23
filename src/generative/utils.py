@@ -1,88 +1,179 @@
 """"""
-
 import torch
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 import numpy as np
+from skimage.metrics import structural_similarity as ssim
+from scipy.ndimage import gaussian_filter
 
 
-# Define the data_assimilation function
-def best_obs_mse_image(
-    autoencoder, obs_dataset_path, num_generated=500, latent_dim=32, device="cpu"
-):
+def get_latent_dim(model):
     """
-    Perform data assimilation using a pre-trained VAE.
+    Get the latent dimension of the VAE model.
 
     Args:
-        autoencoder (nn.Module): The pre-trained VAE model.
-        background_dataset_path (str): Path to the file containing background images.
-        num_generated (int): Number of images to generate from the latent space.
-        latent_dim (int): Dimension of the latent space.
+        model (nn.Module): The VAE model.
+    
+    Returns:
+        latent_dim (int): The latent dimension of the model.
+    """
+    return model._mu.out_features
+
+def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_samples=500, pixel_ratio_range=(5, 14), threshold=0.2, num_images=10, print_info=False):
+    """
+    Generate images from random latent vectors and filter them based on pixel ratio criteria.
+
+    Args:
+        autoencoder (nn.Module): The VAE model.
+        obs_dataset (np.ndarray): The dataset of observation images.
         device (str): The device to run the model on ('cpu' or 'cuda').
+        num_samples (int): Number of images to generate from the latent space.
+        pixel_ratio_range (tuple): Range of pixel activation ratio to filter generated images.
+        threshold (float): The threshold value for binarizing the generated images.
+        num_images (int): Number of "top" images to generate and display.
+        print_info (bool): Whether to print debugging information.
 
     Returns:
-        lowest_mse (float): The lowest MSE value found.
+        filtered_generated_images (list): List of generated images that meet the pixel ratio criteria.
         best_generated_image (np.ndarray): The generated image with the lowest MSE.
-        best_background_image (np.ndarray): The background image with the lowest MSE.
-        best_background_index (int): The index of the background image with the lowest MSE.
+        best_obs_image (np.ndarray): The observation image with the lowest MSE.
+        best_obs_index (int): The index of the observation image with the lowest MSE.
+        lowest_mse (float): The lowest MSE value found.
+        top_images (list): List of the generated images with the lowest MSE.
+        top_mses (list): List of the MSE values of the top generated images.
+
+    Example:
+        filtered_generated_images, best_generated_image, best_obs_image, best_obs_index, lowest_mse, top_images, top_mses = generate_and_filter_images(
+            model,
+            obs_dataset,
+            device='cpu',
+            num_samples=8000,
+            pixel_ratio_range=(5, 14),
+            num_images=50,
+            threshold=0.70 # Adjust threshold based on the dataset
+        )
     """
     autoencoder = autoencoder.to(device)
     autoencoder.eval()
 
-    # Load the background images
-    obs_images = np.load(obs_dataset_path)
-    obs_images = obs_images.squeeze()  # Ensure images have correct dimensions
+    latent_dim = get_latent_dim(autoencoder)
 
     # Generate images from latent space
-    z = torch.randn(num_generated, latent_dim).to(device)
+    z = torch.randn(num_samples, latent_dim).to(device)
     with torch.no_grad():
         generated_images = autoencoder.decoder(z).cpu().numpy()
+    
+    # Reshape generated images to 2D
+    generated_images = generated_images.reshape((num_samples, 256, 256))
+
+    # Apply Gaussian filter to smooth images
+    smoothed_images = [gaussian_filter(img, sigma=1) for img in generated_images]
+
+    # Filtered images based on pixel ratio criteria
+    filtered_generated_images = []
+
+    for i in range(num_samples):
+        generated_image = smoothed_images[i].squeeze()
+
+        # Binarize the generated image with the specified threshold
+        binary_image = np.where(generated_image >= threshold, 1, 0)
+
+        # Calculate pixel ratio
+        total_pixels = np.prod(binary_image.shape)
+        active_pixels = np.sum(binary_image == 1)
+        pixel_ratio = (active_pixels / total_pixels) * 100
+
+        if print_info:
+        # Debugging prints
+            print(f"Generated Image {i + 1}/{num_samples}")
+            print(f"Threshold: {threshold}")
+            print(f"Total Pixels: {total_pixels}")
+            print(f"Active Pixels: {active_pixels}")
+            print(f"Pixel Ratio: {pixel_ratio:.2f}%")
+
+        # Check if the pixel ratio is within the specified range
+        if pixel_ratio_range[0] <= pixel_ratio <= pixel_ratio_range[1]:
+            filtered_generated_images.append(binary_image)
+
+    # Check if filtered images are 0 or not
+    if len(filtered_generated_images) == 0:
+        print('No images meet the pixel ratio criteria.')
+        return None
+
+    total_valid_generated_images = len(filtered_generated_images)
+    print(f"Total Valid Generated Images: {total_valid_generated_images}")
 
     # Initialize variables to store the lowest MSE and corresponding images
-    lowest_mse = float("inf")
+    lowest_mse = float('inf')
+    highest_ssim = -1
     best_generated_image = None
     best_obs_image = None
     best_obs_index = None
 
-    # Iterate through generated images and compare with background images
-    for i in range(num_generated):
-        generated_image = generated_images[i].squeeze()
+    # Iterate through generated images and compare with observation images
+    for i in range(total_valid_generated_images):
+        generated_image = filtered_generated_images[i]
 
-        for j in range(len(obs_images)):
-            obs_image = obs_images[j].squeeze()
+        for j in range(len(obs_dataset)):
+            obs_image = obs_dataset[j].squeeze()
 
             # Compute MSE
             mse = mean_squared_error(obs_image, generated_image)
+            # Compute SSIM
+            ssim_value = ssim(obs_image, generated_image, data_range=generated_image.max() - generated_image.min())
 
-            # Update the lowest MSE and corresponding images
-            if mse < lowest_mse:
+            # Update the best image based on combined criteria
+            if mse < lowest_mse and ssim_value > highest_ssim:
                 lowest_mse = mse
+                highest_ssim = ssim_value
                 best_generated_image = generated_image
                 best_obs_image = obs_image
                 best_obs_index = j
-
-    # Plot the best matching images
+    
+    # Plot the best image with the obs image side by side
     fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-    ax[0].imshow(best_generated_image, cmap="viridis")
+    ax[0].imshow(best_generated_image, cmap='viridis')
     ax[0].set_title("Best Generated Image")
-    ax[0].axis("off")
+    ax[0].axis('off')
 
-    ax[1].imshow(best_obs_image, cmap="viridis")
+    ax[1].imshow(best_obs_image, cmap='viridis')
     ax[1].set_title("Best Observation Image")
-    ax[1].axis("off")
-
+    ax[1].axis('off')
     plt.show()
 
-    return lowest_mse, best_generated_image, best_obs_image, best_obs_index
+    # Compare filtered images with the best generated image
+    mse_list = []
+    for generated_image in filtered_generated_images:
+        mse = mean_squared_error(best_generated_image, generated_image)
+        mse_list.append(mse)
+    
+    # Get the top 100 images
+    top_indices = np.argsort(mse_list)[:num_images]
+    top_images = [filtered_generated_images[i] for i in top_indices]
+    top_mses = [mse_list[i] for i in top_indices]
 
+    # Plot top images if less than or equal to 100, else plot the first 100
+    images_to_plot = min(num_images, 100)
+    num_rows = (images_to_plot + 9) // 10  # Ensure 10 images per row
+    fig, ax = plt.subplots(num_rows, 10, figsize=(20, 2 * num_rows))
+    
+    for i in range(images_to_plot):
+        row = i // 10
+        col = i % 10
+        ax[row, col].imshow(top_images[i], cmap='viridis')
+        ax[row, col].set_title(f"MSE: {top_mses[i]:.2f}")
+        ax[row, col].axis('off')
+    
+    # Hide any unused subplots
+    for j in range(images_to_plot, num_rows * 10):
+        row = j // 10
+        col = j % 10
+        fig.delaxes(ax[row, col])
+    
+    plt.tight_layout()
+    plt.show()
 
-# # Test the data_assimilation function
-# lowest_mse, best_generated_image, best_obs_image, best_obs_index = best_obs_mse_image(
-#     vae, obs_dataset, num_generated=500, latent_dim=latent_dim, device=device
-# )
-
-# print(f'Lowest MSE: {lowest_mse}')
-# print(f'Best Observation Image Index: {best_obs_index}')
+    return filtered_generated_images, best_generated_image, best_obs_image, best_obs_index, lowest_mse, top_images, top_mses
 
 
 def get_device():

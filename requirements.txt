@@ -10,3 +10,4 @@ pytest
 torchvision
 livelossplot
 ipython
+scikit-image
