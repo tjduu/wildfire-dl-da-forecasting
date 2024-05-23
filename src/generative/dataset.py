@@ -29,7 +29,11 @@ class WildfireImageDataSet(Dataset):
         __len__(): Return the total number of images in the dataset.
     """
 
-    def __init__(self, data: Union[List[np.ndarray], np.ndarray], transform: Callable[[np.ndarray], Tensor]):
+    def __init__(
+        self,
+        data: Union[List[np.ndarray], np.ndarray],
+        transform: Callable[[np.ndarray], Tensor],
+    ):
         """Initialise the dataset with data and transform.
 
         Args:

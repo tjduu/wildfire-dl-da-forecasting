@@ -29,7 +29,6 @@ def train(
     n_epochs: int,
     logs: bool = True,
 ) -> Tuple[float, float, float]:
-    
     """Train the model for one epoch.
 
     Parameters
@@ -72,7 +71,9 @@ def train(
         kl_loss += kl_div.item()
 
         if logs:
-            tepoch.set_description(f"Epoch: {curr_epoch}/{n_epochs} | Batch: {batch_idx}/{len(data_loader)}")
+            tepoch.set_description(
+                f"Epoch: {curr_epoch}/{n_epochs} | Batch: {batch_idx}/{len(data_loader)}"
+            )
             tepoch.set_postfix(loss=loss.item() / X.size(0), refresh=False)
             tepoch.update()
 
@@ -159,7 +160,7 @@ def save_checkpoint(
             "train_loss": train_loss,
             "val_loss": val_loss,
         },
-        model_save_path
+        model_save_path,
     )
 
 
@@ -173,7 +174,11 @@ def train_vae(
     model_save_path: Optional[str],
     use_liveloss: bool,
     device: str,
-) -> Tuple[nn.Module, Tuple[List[float], List[float], List[float]], Tuple[List[float], List[float], List[float]]]:
+) -> Tuple[
+    nn.Module,
+    Tuple[List[float], List[float], List[float]],
+    Tuple[List[float], List[float], List[float]],
+]:
     """
     Train the VAE model over multiple epochs, validate it, and save checkpoints.
 
@@ -208,7 +213,9 @@ def train_vae(
     train_losses, train_mse_losses, train_kldiv_losses = [], [], []
     val_losses, val_mse_losses, val_kldiv_losses = [], [], []
 
-    with tqdm(total=len(train_loader) * n_epochs, desc="Training", unit="batch") as tepoch:
+    with tqdm(
+        total=len(train_loader) * n_epochs, desc="Training", unit="batch"
+    ) as tepoch:
         for i in range(n_epochs):
             logs = {}
             _train_losses = train(
@@ -228,13 +235,17 @@ def train_vae(
             logs["train loss"] = _train_losses[0]
 
             if val_loader:
-                _val_losses = validate(model=model, data_loader=val_loader, device=device)
+                _val_losses = validate(
+                    model=model, data_loader=val_loader, device=device
+                )
                 val_losses.append(_val_losses[0])
                 val_mse_losses.append(_val_losses[1])
                 val_kldiv_losses.append(_val_losses[2])
                 logs["val loss"] = _val_losses[0]
 
-            if model_save_path and _train_losses[0] <= min(train_losses, default=float('inf')):
+            if model_save_path and (
+                _train_losses[0] <= min(train_losses, default=float("inf"))
+            ):
                 save_checkpoint(
                     model_weights=model.state_dict(),
                     optimizer_info=optimizer.state_dict(),

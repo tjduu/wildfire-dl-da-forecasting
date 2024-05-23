@@ -9,7 +9,6 @@ Classes:
     PCADecompressor: A derived class from Decompressor that handles a PCA's decompression.
 """
 
-
 from abc import ABC, abstractmethod
 from typing import Any, Union
 
@@ -46,6 +45,7 @@ class Decompressor(ABC):
     def decode(self, x: Union[Tensor, np.ndarray]) -> Union[Tensor, np.ndarray]:
         pass
 
+
 class VAEDecompressor(Decompressor):
     """
     Decompressor using a Variational Autoencoder (VAE).
@@ -67,7 +67,9 @@ class VAEDecompressor(Decompressor):
         self.model_path: str = model_path
         self.model_obj: Module = model_obj
         self.device: str = device
-        self.model = self.load_model(model_path=self.model_path, model_obj=self.model_obj, device=self.device)
+        self.model = self.load_model(
+            model_path=self.model_path, model_obj=self.model_obj, device=self.device
+        )
 
     def load_model(self, model_path: str, model_obj: Module, device: str) -> Module:
         """
@@ -110,6 +112,7 @@ class VAEDecompressor(Decompressor):
             torch.Tensor: Decoded data tensor.
         """
         return self.model.decode(x.to(self.device))
+
 
 class PCADecompressor(Decompressor):
     """

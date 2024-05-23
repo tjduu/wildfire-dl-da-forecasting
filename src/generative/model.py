@@ -102,7 +102,9 @@ class VAE(nn.Module):
         """
         return self.decoder(x)
 
-    def sample_latent_space(self, mu: torch.Tensor, logvar: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def sample_latent_space(
+        self, mu: torch.Tensor, logvar: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Samples from the latent space.
 

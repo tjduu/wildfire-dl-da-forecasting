@@ -7,12 +7,13 @@ Functions:
     using a specified model.
 """
 
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
-from torch import Tensor, nn
-from torch.utils.data import DataLoader
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
 
 
 def plot_batch_recon_images(
@@ -76,5 +77,47 @@ def plot_batch_recon_images(
         ax[2, n].set_title("diff (raw - recon)", fontsize=fontsize)
         ax[2, n].axis("off")
 
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_single_raw_and_dataset_idx_image(
+    data: Union[List[Any], np.ndarray],
+    dataset: Dataset,
+    idx: int = 1,
+    figsize: Tuple[int, int] = (7, 4),
+    cmap: str = "viridis",
+    fontsize: int = 10,
+):
+    """
+    Plot a single image from raw data and a dataset at the specified index.
+
+    Parameters
+    ----------
+    data : Any
+        The raw data containing images.
+    dataset : Dataset
+        The dataset object that supports indexing and returns a tensor image.
+    idx : int, optional
+        The index of the image to be plotted, by default 1.
+    figsize : Tuple[int, int], optional
+        The size of the figure (width, height) in inches, by default (7, 4).
+    cmap : str, optional
+        The color map used to display the image, by default "hot".
+    fontsize : int, optional
+        Font size for the title of the plots, by default 10.
+
+    Returns
+    -------
+    None
+        This function does not return anything but displays a matplotlib plot.
+    """
+    fig, axs = plt.subplots(nrows=1, ncols=2, figsize=figsize)
+    axs[0].imshow(data[idx], cmap=cmap)
+    axs[0].axis("off")
+    axs[1].imshow(dataset.__getitem__(idx).permute(1, 2, 0), cmap=cmap)
+    axs[0].set_title(f"raw data @ idx {idx}", fontsize=fontsize)
+    axs[1].set_title(f"dataset.__getitem__({idx})", fontsize=fontsize)
+    axs[1].axis("off")
     plt.tight_layout()
     plt.show()
