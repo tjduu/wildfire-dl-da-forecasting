@@ -4,7 +4,10 @@
 import torch
 import torch.nn as nn
 
-from training import (train, validate)
+from src.generative.training import (
+    train,
+    validate
+    )
 import itertools
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
