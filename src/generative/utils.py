@@ -10,11 +10,11 @@ from sklearn.metrics import mean_squared_error
 
 
 def best_obs_mse_image(
-    autoencoder: nn.Module, 
-    obs_dataset_path: str, 
-    num_generated: int = 500, 
-    latent_dim: int = 32, 
-    device: str = "cpu"
+    autoencoder: nn.Module,
+    obs_dataset_path: str,
+    num_generated: int = 500,
+    latent_dim: int = 32,
+    device: str = "cpu",
 ) -> Tuple[float, np.ndarray, np.ndarray, int]:
     """
     Perform data assimilation using a pre-trained VAE.
@@ -158,3 +158,13 @@ def sequential_train_val_split(
         print(f"X_val: {X_val.shape}")
 
     return X_train, X_val
+
+
+def generate_latent_space_vectors(
+    model: nn.Module, num_samples: int = 100, latent_dim: int = 16, device: str = "cpu"
+):
+    model.eval()
+    with torch.no_grad():
+        z = torch.randn(num_samples, latent_dim).to(device)
+        samples = model.decode(z).cpu()
+        return samples
