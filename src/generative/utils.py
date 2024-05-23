@@ -1,15 +1,21 @@
-""""""
+"""This module contains functions and utilities used throughout the generative package."""
 
-import torch
-from sklearn.metrics import mean_squared_error
+from typing import List, Optional, Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
+import torch.nn as nn
+from sklearn.metrics import mean_squared_error
 
 
-# Define the data_assimilation function
 def best_obs_mse_image(
-    autoencoder, obs_dataset_path, num_generated=500, latent_dim=32, device="cpu"
-):
+    autoencoder: nn.Module, 
+    obs_dataset_path: str, 
+    num_generated: int = 500, 
+    latent_dim: int = 32, 
+    device: str = "cpu"
+) -> Tuple[float, np.ndarray, np.ndarray, int]:
     """
     Perform data assimilation using a pre-trained VAE.
 
@@ -76,17 +82,8 @@ def best_obs_mse_image(
     return lowest_mse, best_generated_image, best_obs_image, best_obs_index
 
 
-# # Test the data_assimilation function
-# lowest_mse, best_generated_image, best_obs_image, best_obs_index = best_obs_mse_image(
-#     vae, obs_dataset, num_generated=500, latent_dim=latent_dim, device=device
-# )
-
-# print(f'Lowest MSE: {lowest_mse}')
-# print(f'Best Observation Image Index: {best_obs_index}')
-
-
 def get_device():
-    """"""
+    """Return the device (GPU or CPU) that the user's environment is running on/in."""
     device = "cpu"
     if torch.cuda.device_count() > 0 and torch.cuda.is_available():
         device = "cuda"
@@ -99,11 +96,15 @@ def get_device():
 
 def sequential_undersample_3d_arr(arr, sequence_jump, _print: bool = True):
     """
-    test cases:
-    arr = np.array([[[1, 2, 3]], [[-1, -2, -3]], [[4, 5, 6]], [[4, 5, 6]]])
+    Sequentially undersamples a 3D array.
 
-    arr[0:15, :, :], arr[0:0, :, :], arr[0:2, :, :]
+    Parameters:
+        arr (np.ndarray): The 3D array to undersample.
+        sequence_jump (int): The interval at which to undersample.
+        _print (bool): Flag to print the shape of the undersampled array.
 
+    Returns:
+        np.ndarray: The undersampled array.
     """
     assert len(arr.shape) == 3
     sequence_jump = max(1, sequence_jump)  # avoids error at 0.
@@ -124,8 +125,19 @@ def sequential_train_val_split(
     jump_multiplier: int = 3,
     _print: bool = True,
 ):
-    """assumes item number / time is first dim then HxW.
-    1 test: assert train_data.shape[0] == len(train_idx) + len(val_idx)
+    """Creates a training and validation split for sequential data using undersampling.
+
+    The function assumes that the dimensions are (num_images, height (H), width (W)).
+
+    Parameters:
+        train_data (np.ndarray): The dataset to split.
+        sequence_jump (int): The base jump for creating validation indices.
+        start_offset (int): The start offset for the first validation index.
+        jump_multiplier (int): Multiplier to apply to the sequence jump for validation indexing.
+        _print (bool): Flag to print the shapes of the training and validation datasets.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Tuple containing training and validation datasets.
     """
     val_idx = []
     for i in range(
