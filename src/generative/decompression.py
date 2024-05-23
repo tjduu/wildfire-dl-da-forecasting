@@ -24,7 +24,6 @@ Example usage:
     A.shape, B.shape
 """
 
-
 from abc import abstractmethod
 import joblib
 import torch
@@ -39,6 +38,7 @@ class Decompressor:
         encode(x): Encode the input data.
         decode(x): Decode the encoded data.
     """
+
     def __init__(self):
         self.model = None
 
@@ -70,6 +70,7 @@ class VAEDecompressor(Decompressor):
         encode(x): Encode the input data using the VAE.
         decode(x): Decode the encoded data using the VAE.
     """
+
     def __init__(self, model_path, model_obj, device):
         super().__init__()
 
@@ -94,8 +95,7 @@ class VAEDecompressor(Decompressor):
             torch.nn.Module: Loaded VAE model.
         """
         try:
-            model_state = torch.load(model_path,
-                                     map_location=torch.device(device))
+            model_state = torch.load(model_path, map_location=torch.device(device))
             model_obj.load_state_dict(model_state["model_state_dict"])
             model_obj.to(device)
             model_obj.eval()
@@ -142,6 +142,7 @@ class PCADecompressor(Decompressor):
         encode(x): Encode the input data using the PCA model.
         decode(x): Decode the encoded data using the PCA model.
     """
+
     def __init__(self, model_path):
         super().__init__()
 
