@@ -1,6 +1,7 @@
 """"""
 
 import matplotlib.pyplot as plt
+import torch
 
 
 def plot_batch_recon_images(
