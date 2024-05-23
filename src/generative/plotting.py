@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 
+
 def plot_batch_recon_images(
     model,
     data_loader,

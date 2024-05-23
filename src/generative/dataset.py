@@ -1,4 +1,5 @@
 """"""
+
 import torch
 from torch.utils.data import Dataset
 
@@ -11,7 +12,7 @@ class WildfireImageDataSet(Dataset):
 
     def __getitem__(self, idx):
         """Get raw data using idx and apply transforms to output a processed image tensor."""
-        image = self.data[idx] 
+        image = self.data[idx]
         if self.transform:
             image = self.transform(image)
         assert isinstance(image, torch.Tensor)
