@@ -1,4 +1,10 @@
-""""""
+"""
+This module contains functions for plotting reconstructed images from generative fire prediction models.
+
+Functions:
+    plot_batch_recon_images: Plots reconstructed images from a batch using a specified model.
+"""
+
 
 import matplotlib.pyplot as plt
 import torch
@@ -15,7 +21,21 @@ def plot_batch_recon_images(
     plot_idxs: list = [0, 1, 2],
     device: str = "cpu",
 ):
-    """"""
+    """
+    Plot reconstructed images from a batch using a given model.
+
+    Args:
+        model (torch.nn.Module): The model to be used for image reconstruction.
+        data_loader (torch.utils.data.DataLoader): DataLoader providing the batch of images.
+        num_images (int, optional): Number of images to plot. Defaults to 5.
+        cmap (str, optional): Colormap for displaying images. Defaults to 'viridis'.
+        figsize (tuple, optional): Size of the figure for plotting. Defaults to (17, 7).
+        fontsize (int, optional): Font size for the titles. Defaults to 8.
+        plot_random (bool, optional): Whether to plot random images from the batch. Defaults to True.
+        plot_idxs (list, optional): List of indices to plot if plot_random is False. Defaults to [0, 1, 2].
+        device (str, optional): Device to perform computations on. Defaults to 'cpu'.
+
+    """
     num_images = min(data_loader.batch_size, num_images)
 
     img_batch = next(iter(data_loader))  # first batch of images.
