@@ -10,66 +10,71 @@ Functions:
                 and saves checkpoints.
 """
 
+from typing import List, Optional, Tuple
+
 import torch
-import torch.nn as nn
 from livelossplot import PlotLosses
+from torch import nn, optim
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 
 def train(
-    model,
-    device,
-    data_loader,
-    optimizer,
-    tepoch,
-    curr_epoch,
-    n_epochs,
+    model: nn.Module,
+    device: str,
+    data_loader: DataLoader,
+    optimizer: optim.Optimizer,
+    tepoch: tqdm,
+    curr_epoch: int,
+    n_epochs: int,
     logs: bool = True,
-):
-    """
-    Train the model for one epoch.
+) -> Tuple[float, float, float]:
+    
+    """Train the model for one epoch.
 
-    Args:
-        model (torch.nn.Module): The model to train.
-        device (str): Device to perform computations on.
-        data_loader (torch.utils.data.DataLoader): DataLoader providing the
-                                                        training data.
-        optimizer (torch.optim.Optimizer): Optimizer for updating the model
-                                                parameters.
-        tepoch (tqdm.tqdm): tqdm progress bar object.
-        curr_epoch (int): Current epoch number.
-        n_epochs (int): Total number of epochs.
-        logs (bool, optional): Whether to log the progress. Defaults to True.
+    Parameters
+    ----------
+    model : nn.Module
+        The neural network model to train.
+    device : str
+        The device to run the model on, either 'cpu' or 'cuda'.
+    data_loader : DataLoader
+        The DataLoader for providing the training data.
+    optimizer : optim.Optimizer
+        The optimizer used for updating the weights.
+    tepoch : tqdm
+        The tqdm object for progress display.
+    curr_epoch : int
+        The current epoch number.
+    n_epochs : int
+        The total number of epochs to train.
+    logs : bool, optional
+        Flag to control the display of training progress, by default True.
 
-    Returns:
-        tuple: Average training loss, mean squared error, and KL divergence
-        over the dataset.
+    Returns
+    -------
+    Tuple[float, float, float]
+        A tuple containing the average training loss, mean squared error, and KL divergence for the epoch.
     """
     model.train()
-    train_loss, mse_loss, kl_loss = 0, 0, 0
-    for batch_idx, X in enumerate(data_loader, start=1):
+    train_loss, mse_loss, kl_loss = 0.0, 0.0, 0.0
+    for batch_idx, (X, _) in enumerate(data_loader, start=1):
         X = X.float().to(device)
         optimizer.zero_grad()
         X_recon, kl_div = model(X)
-
-        mse = (
-            (X - X_recon) ** 2
-        ).sum()  # TODO: put this in a separate function def calculate MSE().
+        mse = ((X - X_recon) ** 2).sum()
         loss = mse + kl_div
         loss.backward()
+        optimizer.step()
 
         train_loss += loss.item()
         mse_loss += mse.item()
         kl_loss += kl_div.item()
 
-        optimizer.step()
-
         if logs:
-            tepoch.set_description(
-                f"Epoch: {curr_epoch}/{n_epochs} | Batch: {batch_idx}/{len(data_loader)}"
-            )
+            tepoch.set_description(f"Epoch: {curr_epoch}/{n_epochs} | Batch: {batch_idx}/{len(data_loader)}")
             tepoch.set_postfix(loss=loss.item() / X.size(0), refresh=False)
-            tepoch.update(1)
+            tepoch.update()
 
     return (
         train_loss / len(data_loader.dataset),
@@ -78,30 +83,35 @@ def train(
     )
 
 
-def validate(model, data_loader, device):
+def validate(
+    model: nn.Module,
+    data_loader: DataLoader,
+    device: str,
+) -> Tuple[float, float, float]:
     """
     Validate the model.
 
-    Args:
-        model (torch.nn.Module): The model to validate.
-        data_loader (torch.utils.data.DataLoader): DataLoader providing the
-                                                    validation data.
-        device (str): Device to perform computations on.
+    Parameters
+    ----------
+    model : nn.Module
+        The neural network model to validate.
+    data_loader : DataLoader
+        The DataLoader for providing the validation data.
+    device : str
+        The device to run the model on, either 'cpu' or 'cuda'.
 
-    Returns:
-        tuple: Average validation loss, mean squared error, and KL divergence
-                over the dataset.
+    Returns
+    -------
+    Tuple[float, float, float]
+        A tuple containing the average validation loss, mean squared error, and KL divergence for the dataset.
     """
     model.eval()
-    val_loss, mse_loss, kl_loss = 0, 0, 0
+    val_loss, mse_loss, kl_loss = 0.0, 0.0, 0.0
     with torch.no_grad():
-        for batch_idx, X in enumerate(data_loader):
+        for X, _ in data_loader:
             X = X.float().to(device)
             X_recon, kl_div = model(X)
-
-            mse = (
-                (X - X_recon) ** 2
-            ).sum()  # TODO: same as train(), abstract into func.
+            mse = ((X - X_recon) ** 2).sum()
             loss = mse + kl_div
 
             val_loss += loss.item()
@@ -116,71 +126,89 @@ def validate(model, data_loader, device):
 
 
 def save_checkpoint(
-    model_weights, optimizer_info, model_save_path, epoch, train_loss, val_loss
-):
+    model_weights: dict,
+    optimizer_info: dict,
+    model_save_path: str,
+    epoch: int,
+    train_loss: float,
+    val_loss: float,
+) -> None:
     """
     Save the model checkpoint.
 
-    Args:
-        model_weights (dict): Model's state dictionary.
-        optimizer_info (dict): Optimizer's state dictionary.
-        model_save_path (str): Path to save the model checkpoint.
-        epoch (int): Current epoch number.
-        train_loss (float): Training loss at the current epoch.
-        val_loss (float): Validation loss at the current epoch.
+    Parameters
+    ----------
+    model_weights : dict
+        The state dictionary of the model.
+    optimizer_info : dict
+        The state dictionary of the optimizer.
+    model_save_path : str
+        The file path to save the model checkpoint.
+    epoch : int
+        The current epoch number.
+    train_loss : float
+        The training loss at the current epoch.
+    val_loss : float
+        The validation loss at the current epoch.
     """
     torch.save(
-        obj={
+        {
             "model_state_dict": model_weights,
-            "optimiser_state_dict": optimizer_info,
+            "optimizer_state_dict": optimizer_info,
             "epoch": epoch,
             "train_loss": train_loss,
             "val_loss": val_loss,
         },
-        f=model_save_path,
+        model_save_path
     )
 
 
 def train_vae(
-    n_epochs,
-    model,
-    optimizer,
-    scheduler,
-    train_loader,
-    val_loader,
-    model_save_path,
-    use_liveloss,
-    device,
-):
+    n_epochs: int,
+    model: nn.Module,
+    optimizer: optim.Optimizer,
+    scheduler: Optional[optim.lr_scheduler._LRScheduler],
+    train_loader: DataLoader,
+    val_loader: Optional[DataLoader],
+    model_save_path: Optional[str],
+    use_liveloss: bool,
+    device: str,
+) -> Tuple[nn.Module, Tuple[List[float], List[float], List[float]], Tuple[List[float], List[float], List[float]]]:
     """
-    Train the VAE model.
+    Train the VAE model over multiple epochs, validate it, and save checkpoints.
 
-    Args:
-        n_epochs (int): Number of epochs to train.
-        model (torch.nn.Module): The VAE model to train.
-        optimizer (torch.optim.Optimizer): Optimizer for updating the model
-                                                parameters.
-        scheduler (torch.optim.lr_scheduler, optional): Learning rate
-                                                        scheduler.
-        train_loader (torch.utils.data.DataLoader): DataLoader providing the
-                                                    training data.
-        val_loader (torch.utils.data.DataLoader, optional): DataLoader
-                                            providing the validation data.
-        model_save_path (str, optional): Path to save the model checkpoints.
-        use_liveloss (bool, optional): Whether to use livelossplot for logging.
-                                        Defaults to False.
-        device (str): Device to perform computations on.
+    Parameters
+    ----------
+    n_epochs : int
+        The number of epochs to train the model.
+    model : nn.Module
+        The VAE model to train.
+    optimizer : optim.Optimizer
+        The optimizer for updating the model parameters.
+    scheduler : optim.lr_scheduler._LRScheduler, optional
+        The scheduler for adjusting the learning rate.
+    train_loader : DataLoader
+        The DataLoader for providing the training data.
+    val_loader : Optional[DataLoader]
+        The DataLoader for providing the validation data.
+    model_save_path : Optional[str]
+        The file path to save the model checkpoints.
+    use_liveloss : bool
+        Flag to control the use of LiveLossPlot for real-time loss plotting.
+    device : str
+        The device to run the model on, either 'cpu' or 'cuda'.
 
-    Returns:
-        tuple: Trained model, training losses, and validation losses.
+    Returns
+    -------
+    Tuple[nn.Module, Tuple[List[float], List[float], List[float]], Tuple[List[float], List[float], List[float]]]
+        A tuple containing the trained model, lists of training losses, and lists of validation losses.
     """
+
     liveloss = PlotLosses()
-
     train_losses, train_mse_losses, train_kldiv_losses = [], [], []
     val_losses, val_mse_losses, val_kldiv_losses = [], [], []
-    with tqdm(
-        total=len(train_loader) * n_epochs, desc="Training", unit="batch"
-    ) as tepoch:
+
+    with tqdm(total=len(train_loader) * n_epochs, desc="Training", unit="batch") as tepoch:
         for i in range(n_epochs):
             logs = {}
             _train_losses = train(
@@ -197,35 +225,30 @@ def train_vae(
             train_losses.append(_train_losses[0])
             train_mse_losses.append(_train_losses[1])
             train_kldiv_losses.append(_train_losses[2])
-            logs["train loss"] = _train_losses[0]  # for liveloss.
+            logs["train loss"] = _train_losses[0]
 
-            if val_loader is not None:
-                _val_losses = validate(
-                    model=model,
-                    data_loader=val_loader,
-                    device=device,
-                )
+            if val_loader:
+                _val_losses = validate(model=model, data_loader=val_loader, device=device)
                 val_losses.append(_val_losses[0])
                 val_mse_losses.append(_val_losses[1])
                 val_kldiv_losses.append(_val_losses[2])
-                logs["val_train loss"] = _val_losses[0]  # for liveloss.
+                logs["val loss"] = _val_losses[0]
 
-            # save a checkpoint.
-            if model_save_path is not None:
-                if _train_losses[0] <= min(train_losses):
-                    save_checkpoint(
-                        model_weights=model.state_dict(),
-                        optimizer_info=optimizer.state_dict(),
-                        model_save_path=model_save_path,
-                        epoch=i,
-                        train_loss=_train_losses[0],
-                        val_loss=_val_losses[0],
-                    )
+            if model_save_path and _train_losses[0] <= min(train_losses, default=float('inf')):
+                save_checkpoint(
+                    model_weights=model.state_dict(),
+                    optimizer_info=optimizer.state_dict(),
+                    model_save_path=model_save_path,
+                    epoch=i,
+                    train_loss=_train_losses[0],
+                    val_loss=_val_losses[0],
+                )
+
             if use_liveloss:
                 liveloss.update(logs)
                 liveloss.send()
 
-            if scheduler is not None:
+            if scheduler:
                 scheduler.step(_train_losses[0])
 
     return (
