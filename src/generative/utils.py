@@ -1,3 +1,5 @@
+""""""
+
 import torch
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
@@ -78,3 +80,54 @@ def best_obs_mse_image(autoencoder, obs_dataset_path, num_generated=500, latent_
  
 # print(f'Lowest MSE: {lowest_mse}')
 # print(f'Best Observation Image Index: {best_obs_index}')
+
+
+def get_device():
+    """"""
+    device = "cpu"
+    if torch.cuda.device_count() > 0 and torch.cuda.is_available():
+        print("Cuda installed! Running on GPU!")
+        device = "cuda"
+    else:
+        print("No GPU available!")
+    return device
+
+
+def sequential_undersample_3d_arr(arr, sequence_jump, _print:bool=True):
+    """
+    test cases:
+    arr = np.array([[[1, 2, 3]], [[-1, -2, -3]], [[4, 5, 6]], [[4, 5, 6]]])
+
+    arr[0:15, :, :], arr[0:0, :, :], arr[0:2, :, :]
+    
+    """
+    assert len(arr.shape) == 3
+    sequence_jump = max(1, sequence_jump)  # avoids error at 0.
+
+    undersampled_arr = arr[0::sequence_jump, :, :]
+
+    if _print:
+        print("\n** (undersampled) data info **")
+        print(f"X_train_undersampled: {undersampled_arr.shape}")
+
+    return undersampled_arr
+
+def sequential_train_val_split(train_data, sequence_jump:int, start_offset:int=2, jump_multiplier:int=3, _print:bool=True):
+    """assumes item number / time is first dim then HxW.
+    1 test: assert train_data.shape[0] == len(train_idx) + len(val_idx)
+    """
+    val_idx = []
+    for i in range((sequence_jump * start_offset) + 1, train_data.shape[0], sequence_jump * jump_multiplier):
+        val_idx.append(i)
+
+    train_idx = [i for i in range(train_data.shape[0]) if i not in val_idx]
+
+    X_train = train_data[train_idx]
+    X_val = train_data[val_idx]
+
+    if _print:
+        print(f"\n** (split) data info (w/ jump={sequence_jump})**")
+        print(f"X_train: {X_train.shape}")
+        print(f"X_val: {X_val.shape}")   
+
+    return X_train, X_val 

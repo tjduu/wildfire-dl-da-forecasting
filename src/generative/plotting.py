@@ -1,8 +1,6 @@
 """"""
 
 import matplotlib.pyplot as plt
-import torch
-
 
 def plot_batch_recon_images(
     model,
@@ -16,7 +14,7 @@ def plot_batch_recon_images(
     device: str = "cpu",
 ):
     """"""
-    assert num_images <= data_loader.batch_size
+    num_images = min(data_loader.batch_size, num_images)
 
     img_batch = next(iter(data_loader))  # first batch of images.
 
