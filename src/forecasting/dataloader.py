@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-__all__ = ['CustomDataset']
+__all__ = ["CustomDataset"]
 
 
 class CustomDataset(Dataset):
