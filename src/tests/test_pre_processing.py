@@ -15,7 +15,7 @@ from src.forecasting.pre_proccessing import (
 
 @pytest.fixture
 def test_data():
-    test_data_path = 'src/tests/data/test_forecasting_dataset.npy'
+    test_data_path = 'data/test_forecasting_dataset.npy'
     return np.load(test_data_path)
 
 def test_determine_threshold(test_data):
