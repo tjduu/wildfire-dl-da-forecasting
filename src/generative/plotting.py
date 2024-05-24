@@ -121,3 +121,84 @@ def plot_single_raw_and_dataset_idx_image(
     axs[1].axis("off")
     plt.tight_layout()
     plt.show()
+
+
+def generate_images_from_latent_space_vectors(
+    model: nn.Module, num_samples: int = 100, latent_dim: int = 16, device: str = "cpu"
+) -> torch.Tensor:
+    """
+    Generate images by decoding latent space vectors.
+
+    Parameters
+    ----------
+    model : nn.Module
+        The neural network model that includes a decode method.
+    num_samples : int, optional
+        Number of latent space vectors to generate, by default 100.
+    latent_dim : int, optional
+        Dimensionality of the latent space, by default 16.
+    device : str, optional
+        Device on which to perform computations, by default "cpu".
+
+    Returns
+    -------
+    torch.Tensor
+        The tensor containing generated images after decoding random latent space vectors.
+    """
+    model.eval()
+    with torch.no_grad():
+        z = torch.randn(num_samples, latent_dim).to(device)
+        samples = model.decode(z).cpu()
+        return samples
+
+
+def plot_generated_images_from_latent_space(
+    model: nn.Module,
+    num_samples: int,
+    latent_dim: int,
+    img_dims: Tuple[int, int] = (256, 256),
+    pixel_threshold: int = 0,
+    figsize: Tuple[int, int] = (15, 15),
+    device: str = "cpu",
+):
+    """
+    Plot images generated from latent space.
+
+    Parameters
+    ----------
+    model : nn.Module
+        The neural network model to use for generating images.
+    num_samples : int
+        The number of images to generate.
+    latent_dim : int
+        The dimension of the latent space from which to sample.
+    img_dims : Tuple[int, int], optional
+        Dimensions to reshape the images to, by default (256, 256).
+    pixel_threshold : int, optional
+        Threshold value to binarize the images, pixels below this value will be set to 0, above to 1.
+    figsize : Tuple[int, int], optional
+        Figure size for the plot, by default (15, 15).
+    device : str, optional
+        Device on which to perform computations, by default "cpu".
+
+    Returns
+    -------
+    None
+    """
+    generated_images = generate_images_from_latent_space_vectors(
+        model=model, num_samples=num_samples, latent_dim=latent_dim, device=device
+    )
+    nrows, ncols = 10, 10  # TODO: make these dynamic based on num_samples if needed
+
+    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+    for i in range(nrows):
+        for j in range(ncols):
+            img_idx = i * ncols + j
+            if img_idx < num_samples:
+                img = generated_images[img_idx].view(*img_dims).squeeze()
+                if pixel_threshold is not None:
+                    img = np.where(img < pixel_threshold, 0, 1)
+                ax[i, j].imshow(img, cmap="gray")
+                ax[i, j].axis("off")
+    plt.tight_layout()
+    plt.show()
