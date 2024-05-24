@@ -379,25 +379,9 @@ da.plot_fixed_predicted_image()
 
 **Resulting Images**:
 
-### Original Observation
-
 <div align="left">
-<img src="imgs/original_obs.png" width="200">
+<img src="imgs/pca.png" width="500">
 </div>
-
-### Generated Observation
-
-<div align="left">
-<img src="imgs/generated_obs.png" width="200">
-</div>
-
-### Assimilated with Convolutional AE
-
-<div align="left">
-<img src="imgs/da_cae.png" width="200">
-</div>
-
-<a name="tests"></a>
 
 ## Testing
 
