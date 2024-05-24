@@ -1,6 +1,3 @@
-
-
-
 from src.generative.utils import (
     sequential_train_val_split,
     sequential_undersample_3d_arr,
@@ -17,3 +14,11 @@ sequential_undersample_3d_arr
 1 test: assert train_data.shape[0] == len(train_idx) + len(val_idx)
 
 """
+
+#TODO: do this.
+def test_sequential_train_val_split():
+    pass
+
+#TODO: do this.
+def test_sequential_undersample_3d_arr():
+    pass
