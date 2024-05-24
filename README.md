@@ -213,7 +213,7 @@ For this section we use a generative AI method to train a wildfire model. We cho
 <img width="367" alt="Screenshot 2024-05-24 at 08 02 42" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/8d01f2f9-ae80-4f4e-af4d-3d6b325b35b8">
 </div>
 
-`CNNVAE_exploration.ipynb` This notebook explore a convolutional VAE model which we found not to perform as well as our linear VAE. The training took longer, and the images ended up with more of a blur than those we reproduced with our final VAE. The model did instroduce a KL warm up, a learning rate scheduler as well to try and make it more robust. This outlines using our CNN VAE class, which can also be adjusted and altered.
+`CNNVAE_exploration.ipynb` This notebook explores a convolutional VAE model which we found not to perform as well as our linear VAE. The training took longer, and the images ended up with more of a blur surrounding than those we reproduced with our final VAE. The model did introduce a KL warm up and a learning rate scheduler to try and make it more robust. This outlines using our CNN VAE class, which can also be adjusted and altered.
 
 <div align="center">
 <img width="367" alt="Screenshot 2024-05-24 at 08 04 33" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/9b19794d-5a8d-478d-88fd-0d7ff845dcc4">
