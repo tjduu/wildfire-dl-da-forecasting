@@ -1,7 +1,7 @@
 Forecasting Module
 ==================
 
-.. automodule:: src.forecasting
+.. automodule:: atlaswildfiretool.forecasting
    :members:
    :undoc-members:
    :show-inheritance:
