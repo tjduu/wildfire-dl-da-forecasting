@@ -4,7 +4,7 @@ with open("requirements.txt") as requirement_file:
     requirements = requirement_file.read().split()
 
 setup(
-    name="atlas-wildfire-tool",
+    name="atlaswildfiretool",
     version="1.0",
     description="Atlas Wildfire Tool",
     author="Atlas",

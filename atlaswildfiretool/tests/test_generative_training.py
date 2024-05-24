@@ -23,7 +23,9 @@ def test_train_vae_calls_train_and_validate(setup_model):
 
     with patch("atlaswildfiretool.generative.training.train") as mock_train, patch(
         "atlaswildfiretool.generative.training.validate"
-    ) as mock_validate, patch("atlaswildfiretool.generative.training.save_checkpoint") as mock_save:
+    ) as mock_validate, patch(
+        "atlaswildfiretool.generative.training.save_checkpoint"
+    ) as mock_save:
         train_vae(
             n_epochs=n_epochs,
             model=model,
