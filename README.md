@@ -104,6 +104,12 @@ Four datasets were used to train the models in this repository:
    <img width="740" alt="Datasets" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/144276975/5f284def-07a3-44c3-9611-fa592a855b02">
 </div>
 
+### Visualising the Fire Propagation
+
+<div align="center">
+  <img src="imgs/train_sequence.gif" width="500" />
+</div>
+
 <hr style="border: none; border-top: 2px solid fire;"/>
 
 <a name="obj1"></a>
