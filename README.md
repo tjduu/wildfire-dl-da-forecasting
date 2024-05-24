@@ -377,19 +377,8 @@ da.plot_fixed_predicted_image()
 
 **Resulting Images**:
 
-<div style="text-align: center;">
-  <div style="display: inline-block; margin: 10px;">
-    <p><strong>Original Image</strong>:</p>
-    <img src="imgs/original_obs.png" width="200">
-  </div>
-  <div style="display: inline-block; margin: 10px;">
-    <p><strong>Reconstructed Image</strong>:</p>
-    <img src="imgs/generated_obs.png" width="200">
-  </div>  
-  <div style="display: inline-block; margin: 10px;">
-    <p><strong>Updated Image After Data Assimilation</strong>:</p>
-    <img src="imgs/da_pca.png" width="200">
-  </div>
+<div align="center">
+<img src="imgs/pca.png" width=300>
 </div>
 
 **Mean Squared Error (MSE)** using CAE:
@@ -401,19 +390,19 @@ da.plot_fixed_predicted_image()
 
 **Resulting Images**:
 
-<div style="text-align: center;">
-  <div style="display: inline-block; margin: 10px;">
-    <p><strong>Original Image</strong>:</p>
-    <img src="imgs/original_obs.png" width="200">
-  </div>
-  <div style="display: inline-block; margin: 10px;">
-    <p><strong>Reconstructed Image</strong>:</p>
-    <img src="imgs/generated_obs.png" width="200">
-  </div>
-  <div style="display: inline-block; margin: 10px;">
-    <p><strong>Updated Image After Data Assimilation</strong>:</p>
-    <img src="imgs/da_cae.png" width="200">
-  </div>
+### Original Observation
+<div align="center">
+<img src="imgs/original_obs.png" width=300>
+</div>
+
+### Generated Observation
+<div align="center">
+<img src="imgs/generated_obs.png" width=300>
+</div>
+
+### Assimilated with Convolutional AE
+<div align="center">
+<img src="imgs/da_cae.png" width=300>
 </div>
 
 <a name="tests"></a>
