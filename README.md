@@ -198,31 +198,31 @@ For this section we use a generative AI method to train a wildfire model. We cho
 `FCVAE_Tuning.ipynb` This notebook sets up a baseline model with our VAE class and plot the reconstructed images. The notebook then shows how different metrics can be tuned, such as learning rate, activation functions and even adding a beta warmup. These parameters can easily be adjusted using our class and functions. The architecture, performance, number of epochs and additional comments are provided in the notebook and can also be seen below.
 
 <div align="center">
-<img width="1039" alt="Screenshot 2024-05-24 at 10 29 35" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/ca954296-4f01-4932-95f8-d64b98d588bb">
+<img width="1039" src="imgs/tuning_table.png">
 </div>
 
 `FCVAE_gridsearch.ipynb` This notebook details a more robust grid search for parameter tuning. Given the structure of our linear VAE class, many of these adjustments can be made easily within the model function parameters, or in the training function parameters. We look at modifying the number and size of the hidden layers, the latent dimension, batch size and learning rates. This code can be easily replicated to try different parameters, or more parameters.
 
 <div align="center">
-<img width="367" alt="Screenshot 2024-05-24" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/f9a7115d-b197-4073-9639-272deb510071">
+<img width="367" src="imgs/grid_search.png">
 </div>
 
 `vae_image_selection.ipynb` This notebook shows how, given a trained model, we can generate a 'best image' from a batch of images. The selection is based on certain criteria defined in the notebook, allowing us to identify and select the highest quality generated images for Data Assimilation. We did some image processing within the function we used to do the comparison of generated models to the satellite images. This included a gaussian smooth as well as a SSIM calculation on top of the MSE calculation to really produce images that were as close to the satellite as we could get them. Below is an example of one run of hte function to produce a 'best image'.
 
 <div align="center">
-<img width="367" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/cf6daf14-ba7c-484b-8f21-879c6a9029bd">
+<img width="367" src="imgs/image_generation.png">
 </div>
 
 `FCVAE_final_training.ipynb` This notebook trains the final model we chose with the entire 17,500 wildfire sequenced images and is run for a total of 100 epochs. We plot the training loss as well as the original and reconstructed images with their difference (using a custom function) to show how well this model did. The final model used ReLU as the activation with a dip in the MSE() while training due to the learning rate scheduler that was added. Our MSE on training was ```54.648```.
 
 <div align="center">
-<img width="367" alt="Screenshot 2024-05-24 at 08 02 42" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/8d01f2f9-ae80-4f4e-af4d-3d6b325b35b8">
+<img width="367" src="imgs/final_training.png">
 </div>
 
 `CNNVAE_exploration.ipynb` This notebook explores a convolutional VAE model which we found not to perform as well as our linear VAE. The training took longer, and the images ended up with more of a blur surrounding than those we reproduced with our final VAE. The model did introduce a KL warm up and a learning rate scheduler to try and make it more robust. This outlines using our CNN VAE class, which can also be adjusted and altered.
 
 <div align="center">
-<img width="367" alt="Screenshot 2024-05-24 at 08 04 33" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/9b19794d-5a8d-478d-88fd-0d7ff845dcc4">
+<img width="367" src="imgs/cnn_vae_images.png">
 </div>
 
 <a name="obj3"></a>
