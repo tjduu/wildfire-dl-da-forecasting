@@ -8,6 +8,26 @@ from src.generative.utils import (
 )
 
 
+def test_test_sequential_train_val_split():
+    """test sequential_train_val_split() for ~ 90:10 split."""
+    test_data_path = "src/tests/data/test_forecasting_dataset.npy"
+    test_data = np.load(test_data_path)
+
+    actual_train, actual_val = sequential_train_val_split(
+        train_data=test_data, sequence_jump=3, start_offset=2, jump_multiplier=3
+    )
+
+    desired_val_indexes = [i for i in range(7, 50, 9)]
+    desired_train_indexes = [
+        i for i in range(test_data.shape[0]) if i not in desired_val_indexes
+    ]
+    desired_train = test_data[desired_train_indexes]
+    desired_val = test_data[desired_val_indexes]
+
+    assert np.allclose(actual_train, desired_train)
+    assert np.allclose(actual_val, desired_val)
+
+
 def test_sequential_undersample_3d_arr_no_jump():
     """Test sequential_undersample_3d_arr() when jump is < len arr."""
     test_arr = np.array([[[1, 2, 3]], [[-1, -2, -3]], [[4, 5, 6]], [[4, 5, 6]]])
@@ -37,28 +57,3 @@ def test_sequential_undersample_3d_arr_jump_size_outside_len_arr():
     desired = np.array([[[1, 2, 3]]])  # only 1st row by default.
 
     assert np.allclose(actual, desired)
-
-def test_test_sequential_train_val_split():
-    
-
-    test_data_path = "src/tests/data/test_forecasting_dataset.npy"
-    test_data = np.load(test_data_path)
-
-
-
-# # TODO: do this.
-# def test_sequential_train_val_split():
-#     test_arr = np.array([[[1, 2, 3]], [[-1, -2, -3]], [[4, 5, 6]], [[4, 5, 6]]])
-
-
-"""
-sequential_train_val_split
-test cases:
-    arr = np.array([[[1, 2, 3]], [[-1, -2, -3]], [[4, 5, 6]], [[4, 5, 6]]])
-
-    arr[0:15, :, :], arr[0:0, :, :], arr[0:2, :, :]
-
-sequential_undersample_3d_arr
-1 test: assert train_data.shape[0] == len(train_idx) + len(val_idx)
-
-"""
