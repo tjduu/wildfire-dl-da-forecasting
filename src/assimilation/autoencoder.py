@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, hidden_dim, train_path, test_path, back_path, obs_path, device='cpu'):
+    def __init__(
+        self, hidden_dim, train_path, test_path, back_path, obs_path, device="cpu"
+    ):
         super(Autoencoder, self).__init__()
         self.train_path = train_path
         self.test_path = test_path
@@ -17,18 +19,16 @@ class Autoencoder(nn.Module):
         # 加载数据
         self.train_tensor, self.test_tensor = self.load_train_test_data()
         self.back_tensor, self.obs_tensor = self.load_back_obs_data()
-        
+
         self.input_dim = self.train_tensor.shape[1]  # 已经展平，不需要再乘
 
         self.hidden_dim = hidden_dim
 
         self.encoder = nn.Sequential(
-            nn.Linear(self.input_dim, hidden_dim),
-            nn.ReLU(True)
+            nn.Linear(self.input_dim, hidden_dim), nn.ReLU(True)
         )
         self.decoder = nn.Sequential(
-            nn.Linear(hidden_dim, self.input_dim),
-            nn.ReLU(True)
+            nn.Linear(hidden_dim, self.input_dim), nn.ReLU(True)
         )
         self.to(self.device)
 
@@ -80,19 +80,23 @@ class Autoencoder(nn.Module):
             self.eval()
             with torch.no_grad():
                 _, test_decoded = self(self.test_tensor.to(self.device))
-                test_loss = criterion(test_decoded, self.test_tensor.to(self.device)).item()
+                test_loss = criterion(
+                    test_decoded, self.test_tensor.to(self.device)
+                ).item()
                 test_losses.append(test_loss)
 
             if (epoch + 1) % 10 == 0:
-                print(f'Epoch [{epoch + 1}/{num_epochs}], Train Loss: {loss.item():.4f}, Test Loss: {test_loss:.4f}')
+                print(
+                    f"Epoch [{epoch + 1}/{num_epochs}], Train Loss: {loss.item():.4f}, Test Loss: {test_loss:.4f}"
+                )
 
         plt.figure()
-        plt.plot(train_losses, label='Train Loss')
-        plt.plot(test_losses, label='Test Loss')
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
+        plt.plot(train_losses, label="Train Loss")
+        plt.plot(test_losses, label="Test Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
         plt.legend()
-        plt.title('Training and Testing Loss')
+        plt.title("Training and Testing Loss")
         plt.show()
 
     def compute_mse(self, n=None):
@@ -105,9 +109,16 @@ class Autoencoder(nn.Module):
                 back_encoded, back_decoded = back_encoded[:n], back_decoded[:n]
                 obs_encoded, obs_decoded = obs_encoded[:n], obs_decoded[:n]
             mse_reduced_space = criterion(back_encoded, obs_encoded).item()
-            mse_physical_space = criterion(back_decoded, self.obs_tensor[:n].to(self.device) if n is not None else self.obs_tensor.to(self.device)).item()
-        print(f'MSE in reduced space: {mse_reduced_space:.4f}')
-        print(f'MSE in physical space: {mse_physical_space:.4f}')
+            mse_physical_space = criterion(
+                back_decoded,
+                (
+                    self.obs_tensor[:n].to(self.device)
+                    if n is not None
+                    else self.obs_tensor.to(self.device)
+                ),
+            ).item()
+        print(f"MSE in reduced space: {mse_reduced_space:.4f}")
+        print(f"MSE in physical space: {mse_physical_space:.4f}")
         return mse_reduced_space, mse_physical_space
 
     def compress_and_decompress(self, visualize=False, n=None):
@@ -115,7 +126,7 @@ class Autoencoder(nn.Module):
         with torch.no_grad():
             back_encoded, back_decoded = self(self.back_tensor.to(self.device))
             obs_encoded, obs_decoded = self(self.obs_tensor.to(self.device))
-        
+
         if n is None:
             n = min(self.back_tensor.shape[0], self.obs_tensor.shape[0])
         n = min(n, self.back_tensor.shape[0], self.obs_tensor.shape[0])
@@ -124,14 +135,16 @@ class Autoencoder(nn.Module):
             plt.figure(figsize=(10, 4))
             for i in range(n):
                 ax = plt.subplot(2, n, i + 1)
-                plt.imshow(self.back_tensor[i].cpu().numpy().reshape(256, 256), cmap='gray')
+                plt.imshow(
+                    self.back_tensor[i].cpu().numpy().reshape(256, 256), cmap="gray"
+                )
                 ax.get_xaxis().set_visible(False)
                 ax.get_yaxis().set_visible(False)
                 if i == 0:
                     ax.set_title("Original")
 
                 ax = plt.subplot(2, n, i + 1 + n)
-                plt.imshow(back_decoded[i].cpu().numpy().reshape(256, 256), cmap='gray')
+                plt.imshow(back_decoded[i].cpu().numpy().reshape(256, 256), cmap="gray")
                 ax.get_xaxis().set_visible(False)
                 ax.get_yaxis().set_visible(False)
                 if i == 0:
@@ -142,19 +155,21 @@ class Autoencoder(nn.Module):
             plt.figure(figsize=(10, 4))
             for i in range(n):
                 ax = plt.subplot(2, n, i + 1)
-                plt.imshow(self.obs_tensor[i].cpu().numpy().reshape(256, 256), cmap='gray')
+                plt.imshow(
+                    self.obs_tensor[i].cpu().numpy().reshape(256, 256), cmap="gray"
+                )
                 ax.get_xaxis().set_visible(False)
                 ax.get_yaxis().set_visible(False)
                 if i == 0:
                     ax.set_title("Original")
 
                 ax = plt.subplot(2, n, i + 1 + n)
-                plt.imshow(obs_decoded[i].cpu().numpy().reshape(256, 256), cmap='gray')
+                plt.imshow(obs_decoded[i].cpu().numpy().reshape(256, 256), cmap="gray")
                 ax.get_xaxis().set_visible(False)
                 ax.get_yaxis().set_visible(False)
                 if i == 0:
                     ax.set_title("Reconstructed")
 
             plt.show()
-        
+
         return back_encoded[:n], back_decoded[:n], obs_encoded[:n], obs_decoded[:n]

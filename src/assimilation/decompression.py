@@ -42,6 +42,7 @@ Notes:
     - Validate all model paths and ensure correct setup before utilization to avoid runtime errors.
 """
 
+
 class Decompressor:
     def __init__(self):
         self.model = None
@@ -58,6 +59,7 @@ class Decompressor:
     def decode(self, x):
         pass
 
+
 class PCADecompressor(Decompressor):
     # non CPU/GPU --> dont need device.
     def __init__(self, model_path):
@@ -65,7 +67,7 @@ class PCADecompressor(Decompressor):
 
         self.model_path = model_path
         self.model = self.load_model(model_path)
-    
+
     def load_model(self, model_path):
         model_obj = joblib.load(model_path)
         return model_obj
@@ -80,9 +82,9 @@ class PCADecompressor(Decompressor):
 
     def decode(self, x):
         return self.model.inverse_transform(x).reshape(1, 256, 256)
-    
+
     def get_model_type(self):
-        return 'PCA'
+        return "PCA"
 
 
 class AutoencoderDecompressor(Decompressor):
@@ -91,7 +93,9 @@ class AutoencoderDecompressor(Decompressor):
         self.model_path = model_path
         self.model_obj = model_obj
         self.device = device
-        self.model = self.load_model(model_path=model_path, model_obj=self.model_obj, device=self.device)
+        self.model = self.load_model(
+            model_path=model_path, model_obj=self.model_obj, device=self.device
+        )
 
     def load_model(self, model_path, model_obj, device):
         try:
@@ -109,15 +113,16 @@ class AutoencoderDecompressor(Decompressor):
         x_tensor = torch.tensor(x).float().view(x.shape[0], -1)
         encoded = self.model.encoder(x_tensor.to(self.device))
         return encoded.cpu().detach().numpy()  # convert to numpy
- 
+
     def decode(self, x):
         x_tensor = torch.tensor(x).float().to(self.device)  # covert numpy to tensor
         decoded = self.model.decoder(x_tensor)
         decoded = decoded.view(decoded.size(0), 256, 256)  # flat back
         return decoded.cpu().detach().numpy()  # convert to numpy
-    
+
     def get_model_type(self):
-        return 'AutoEncoder'
+        return "AutoEncoder"
+
 
 class CAEDecompressor(Decompressor):
     def __init__(self, model_path, model_obj, device):
@@ -125,7 +130,9 @@ class CAEDecompressor(Decompressor):
         self.model_path = model_path
         self.model_obj = model_obj
         self.device = device
-        self.model = self.load_model(model_path=model_path, model_obj=self.model_obj, device=self.device)
+        self.model = self.load_model(
+            model_path=model_path, model_obj=self.model_obj, device=self.device
+        )
 
     def load_model(self, model_path, model_obj, device):
         try:
@@ -144,26 +151,30 @@ class CAEDecompressor(Decompressor):
             x = np.expand_dims(x, axis=1)  # convert to (N, 1, 256, 256)
         x_tensor = torch.tensor(x).float().to(self.device)
         encoded = self.model.encoder(x_tensor)
-        encoded = encoded.cpu().detach().numpy()  # Correct conversion from tensor to numpy array
+        encoded = (
+            encoded.cpu().detach().numpy()
+        )  # Correct conversion from tensor to numpy array
 
         # Assuming the output of encoder is (N, C, H, W)
         if len(encoded.shape) == 4:
-            new_shape = (encoded.shape[0], encoded.shape[1] * encoded.shape[2] * encoded.shape[3])
+            new_shape = (
+                encoded.shape[0],
+                encoded.shape[1] * encoded.shape[2] * encoded.shape[3],
+            )
             encoded = encoded.reshape(new_shape)
-        return encoded 
+        return encoded
 
- 
     def decode(self, x):
-            # check input shape，convert to (N, C, H, W) 如果需要
+        # check input shape，convert to (N, C, H, W) 如果需要
         if len(x.shape) == 2:  # if input is (N, C*H*W)
             C = 8  # chanel
-            H = 64  
-            W = 64  
-            x = x.reshape(-1, C, H, W)  
+            H = 64
+            W = 64
+            x = x.reshape(-1, C, H, W)
         x_tensor = torch.tensor(x).float().to(self.device)  # convert numpy to tensor
         decoded = self.model.decoder(x_tensor)
         decoded = decoded.squeeze(1)  # delet chanel
         return decoded.cpu().detach().numpy()  # convert to numpy
-    
+
     def get_model_type(self):
-        return 'CAutoEncoder'
+        return "CAutoEncoder"
