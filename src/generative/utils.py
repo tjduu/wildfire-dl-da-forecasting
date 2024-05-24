@@ -158,3 +158,24 @@ def sequential_train_val_split(
         print(f"X_val: {X_val.shape}")
 
     return X_train, X_val
+
+
+def load_model(model_obj, model_path, device):
+    model_obj.load_state_dict(
+        torch.load(model_path, map_location=torch.device(device))["model_state_dict"]
+    )
+    model_obj.to(device)
+    model_obj.eval()
+    return model_obj
+
+
+def test_data_metrics(model, criterion, data_loader, device):
+    total_error = 0
+    with torch.no_grad():
+        for X_test in data_loader:
+            X_test = X_test.float().to(device)
+            recon, _ = model(X_test)
+            error = criterion(recon, X_test)
+            total_error += error
+
+    return (total_error / len(data_loader.dataset)).item()
