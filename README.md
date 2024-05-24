@@ -216,7 +216,7 @@ For this section we use a generative AI method to train a wildfire model. We cho
 `CNNVAE_exploration-WIP.ipynb` This notebook explore a convolutional VAE model which we found not to perform as well as our linear VAE. The training took longer, and the images ended up with more of a blur than those we reproduced with our final VAE. The model did instroduce a KL warm up, a learning rate scheduler as well to try and make it more robust. This outlines using our CNN VAE class, which can also be adjusted and altered.
 
 <div align="center">
-<img width="392" alt="Screenshot 2024-05-24 at 08 04 33" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/9b19794d-5a8d-478d-88fd-0d7ff845dcc4">
+<img width="367" alt="Screenshot 2024-05-24 at 08 04 33" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/9b19794d-5a8d-478d-88fd-0d7ff845dcc4">
 </div>
 
 <a name="obj3"></a>
