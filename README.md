@@ -401,8 +401,9 @@ To generate documentation:
 ```bash
    pip install sphinx
 ```
-After sphinx is installed, in the root directory run:
+After sphinx is installed, navigate to the `docs` folder and run:
 ```bash
+   cd docs
    make html
 ```
 Then, navigate to the html folder and open the html file:
