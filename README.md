@@ -29,7 +29,7 @@ In this repository, we are using model and observation data from the 2018 Califo
 ## Repository Structure
 
 ```acds3-wildfire-atlas/
-├── src/
+├── atlaswildfiretool/
 │ ├── forecasting
 │ │ └── ...
 │ ├── generative
@@ -73,7 +73,7 @@ In this repository, we are using model and observation data from the 2018 Califo
    ```bash
    conda activate atlas
    ```
-5. Navigate to the root directory (contains the `\src` directory) and install the package:
+5. Navigate to the root directory (contains the `\atlaswildfiretool` directory) and install the package:
 
    ```bash
    pip install -e .
@@ -120,7 +120,7 @@ Use a recurrent neural network to train a surrogate model of a wildfires predict
 
 ### Notebook
 
-In the `src/notebook/wildfire_forecastin_task1.ipynb` file, we demonstrate the entire workflow of our model. First, we show how to preprocess the data and train the model. Then, we illustrate how to generate prediction images and compare them with the real images. At the end of the notebook, we discuss our previous model attempts, explain why we discarded them, and detail the process of adjusting the model's hyperparameters.
+In the `atlaswildfiretool/notebook/wildfire_forecastin_task1.ipynb` file, we demonstrate the entire workflow of our model. First, we show how to preprocess the data and train the model. Then, we illustrate how to generate prediction images and compare them with the real images. At the end of the notebook, we discuss our previous model attempts, explain why we discarded them, and detail the process of adjusting the model's hyperparameters.
 
 We showcase the final performance of our model through generating images. Overall, the model achieved an average MSE of 0.0014 on the test dataset, an MSE of 0.0124 on the background dataset, and an MSE of 0.0125 on the obs dataset.
 
@@ -191,7 +191,7 @@ test_output, background_output, obs_output = generate(model, test_data_path, bac
 
 # 🔥 Wildfire Surrogate Model using VAE
 
-For this section we use a generative AI method to train a wildfire model. We chose to use a VAE to generate wildfire images. Our best model was a fully connected linear VAE, and we did a lot to fine tune this network. Our notebooks that are in this folder: ```src/notebooks/generative``` detail this work as well as demonstrate function usage and show the work we did toward finding a high performing generative model.
+For this section we use a generative AI method to train a wildfire model. We chose to use a VAE to generate wildfire images. Our best model was a fully connected linear VAE, and we did a lot to fine tune this network. Our notebooks that are in this folder: ```atlaswildfiretool/notebooks/generative``` detail this work as well as demonstrate function usage and show the work we did toward finding a high performing generative model.
 
 ## Model Notebooks
 
@@ -249,7 +249,7 @@ We train a PCA model on the provided training data. Important parameters include
 ### PCA Training Example
 
 ```python
-from src.assimilation.train_pca import TrainPCA
+from atlaswildfiretool.assimilation.train_pca import TrainPCA
 
 # Initialize TrainPCA object
 pca_trainer = TrainPCA(
@@ -342,7 +342,7 @@ We compress and then decompress the observational and background data using the 
 ### Data Assimilation Example
 
 ```python
-from src.assimilation.data_assimilation import DataAssimilation
+from atlaswildfiretool.assimilation.data_assimilation import DataAssimilation
 
 # Initialize DataAssimilation object
 da = DataAssimilation(
@@ -416,7 +416,7 @@ da.plot_fixed_predicted_image()
 
 This repository includes several tests, which you can use to check its operation on your system. When you are in the 'atlas' environment, the tests can be run by entering this code in terminal:
 ```
-python -m pytest src/tests
+python -m pytest atlaswildfiretool/tests
 ```
 The tests do cover the basics, although more robust testing is lacking from the current set up, and something that can be improved upon in the future.
 
