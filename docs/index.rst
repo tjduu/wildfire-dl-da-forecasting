@@ -12,6 +12,7 @@ Welcome to ACDS3 Wildfire Atlas's documentation!
 
    generative
    forecasting
+   assimilation
 
 Indices and tables
 ==================
@@ -19,19 +20,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-Generative Module
-=================
-
-.. automodule:: src.generative
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Forecasting Module
-==================
-
-.. automodule:: src.forecasting
-   :members:
-   :undoc-members:
-   :show-inheritance:
