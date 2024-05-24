@@ -1,5 +1,6 @@
 import pytest
-from src.forecasting.loss_func import gaussian, create_window, ssim, SSIMLoss
+
+from src.forecasting.loss_func import SSIMLoss, create_window, gaussian, ssim
 
 
 def test_loss_func():

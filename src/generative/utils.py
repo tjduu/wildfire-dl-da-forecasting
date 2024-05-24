@@ -1,12 +1,13 @@
 """This module contains functions and utilities used throughout the generative package."""
 
-from typing import List, Optional, Tuple
+from typing import Callable, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
 from sklearn.metrics import mean_squared_error
+from torch.utils.data import DataLoader
 
 
 def best_obs_mse_image(
@@ -94,7 +95,9 @@ def get_device():
     return device
 
 
-def sequential_undersample_3d_arr(arr, sequence_jump, _print: bool = True):
+def sequential_undersample_3d_arr(
+    arr: np.ndarray, sequence_jump: int, _print: bool = True
+) -> np.ndarray:
     """
     Sequentially undersamples a 3D array.
 
@@ -119,12 +122,12 @@ def sequential_undersample_3d_arr(arr, sequence_jump, _print: bool = True):
 
 
 def sequential_train_val_split(
-    train_data,
+    train_data: np.ndarray,
     sequence_jump: int,
     start_offset: int = 2,
     jump_multiplier: int = 3,
     _print: bool = True,
-):
+) -> Tuple[np.ndarray, np.ndarray]:
     """Creates a training and validation split for sequential data using undersampling.
 
     The function assumes that the dimensions are (num_images, height (H), width (W)).
@@ -158,3 +161,66 @@ def sequential_train_val_split(
         print(f"X_val: {X_val.shape}")
 
     return X_train, X_val
+
+
+def load_model(model_obj: nn.Module, model_path: str, device: str) -> nn.Module:
+    """
+    Load a pre-trained model's weights from a specified file and prepare it for inference.
+
+    Parameters
+    ----------
+    model_obj : nn.Module
+        The PyTorch model object that will load the weights.
+    model_path : str
+        The path to the file containing the model's state dictionary.
+    device : str
+        The device to which the model should be moved ('cpu' or 'cuda').
+
+    Returns
+    -------
+    nn.Module
+        The model with loaded weights, moved to the specified device and set to evaluation mode.
+    """
+    model_obj.load_state_dict(
+        torch.load(model_path, map_location=torch.device(device))["model_state_dict"]
+    )
+    model_obj.to(device)
+    model_obj.eval()
+
+    return model_obj
+
+
+def test_data_metrics(
+    model: nn.Module,
+    criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
+    data_loader: DataLoader,
+    device: str,
+) -> float:
+    """
+    Evaluate a model using a specified criterion on a dataset provided by a DataLoader.
+
+    Parameters
+    ----------
+    model : nn.Module
+        The neural network model to be evaluated.
+    criterion : Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        The function to compute the error metric between model predictions and true data.
+    data_loader : DataLoader
+        The DataLoader providing the dataset over which the model is evaluated.
+    device : str
+        The device to which data should be moved before model evaluation ('cpu' or 'cuda').
+
+    Returns
+    -------
+    float
+        The average error across all data in the dataset as calculated by the criterion.
+    """
+    total_error = 0.0
+    with torch.no_grad():
+        for X_test in data_loader:
+            X_test = X_test.float().to(device)
+            recon, _ = model(X_test)
+            error = criterion(recon, X_test)
+            total_error += error.item()
+
+    return total_error / len(data_loader.dataset)

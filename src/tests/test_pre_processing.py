@@ -1,16 +1,17 @@
-import pytest
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import pytest
+
 from src.forecasting.pre_proccessing import (
-    determine_threshold,
+    analyze_sequences,
     compute_mse,
     detect_changes,
-    tag_sequences,
+    determine_threshold,
     filter_train_images,
-    plot_differences_with_threshold,
-    analyze_sequences,
     get_tags,
+    plot_differences_with_threshold,
+    tag_sequences,
 )
 
 
