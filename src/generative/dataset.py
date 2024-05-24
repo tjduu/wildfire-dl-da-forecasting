@@ -7,7 +7,11 @@ Classes:
     wildfire images.
 """
 
+from typing import Callable, List, Union
+
+import numpy as np
 import torch
+from torch import Tensor
 from torch.utils.data import Dataset
 
 
@@ -25,7 +29,11 @@ class WildfireImageDataSet(Dataset):
         __len__(): Return the total number of images in the dataset.
     """
 
-    def __init__(self, data, transform):
+    def __init__(
+        self,
+        data: Union[List[np.ndarray], np.ndarray],
+        transform: Callable[[np.ndarray], Tensor],
+    ):
         """Initialise the dataset with data and transform.
 
         Args:
@@ -35,7 +43,7 @@ class WildfireImageDataSet(Dataset):
         self.data = data
         self.transform = transform
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tensor:
         """Get raw data using idx and apply transforms to output a processed
         image tensor.
 
@@ -48,11 +56,9 @@ class WildfireImageDataSet(Dataset):
         image = self.data[idx]
         if self.transform:
             image = self.transform(image)
-        assert isinstance(image, torch.Tensor)
-
         return image
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the total number of images in the dataset.
 
         Returns:

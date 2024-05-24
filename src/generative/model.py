@@ -10,14 +10,14 @@ Classes:
     CVAE: Defines a Convolutional Variational Autoencoder.
 """
 
+import itertools
+from typing import Any, Callable, List, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
-
-from src.generative.training import train, validate
-import itertools
-import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
-import numpy as np
 from tqdm import tqdm
 
 
@@ -37,11 +37,11 @@ class VAE(nn.Module):
 
     def __init__(
         self,
-        input_image_dims,
-        latent_dims,
-        hidden_layers,
-        activation=nn.ReLU,
-        device="cpu",
+        input_image_dims: Tuple[int, int, int],
+        latent_dims: int,
+        hidden_layers: List[int],
+        activation: Callable[..., nn.Module] = nn.ReLU,
+        device: str = "cpu",
     ):
         super().__init__()
 
@@ -78,7 +78,7 @@ class VAE(nn.Module):
         modules.append(nn.Sigmoid())
         self.decoder = nn.Sequential(*modules)
 
-    def encode(self, x):
+    def encode(self, x: torch.Tensor) -> torch.Tensor:
         """
         Encodes the input into the latent space using the VAE.
 
@@ -90,7 +90,7 @@ class VAE(nn.Module):
         """
         return self.encoder(x)
 
-    def decode(self, x):
+    def decode(self, x: torch.Tensor) -> torch.Tensor:
         """
         Decodes the latent representation back into the input space.
 
@@ -102,7 +102,9 @@ class VAE(nn.Module):
         """
         return self.decoder(x)
 
-    def sample_latent_space(self, mu, logvar):
+    def sample_latent_space(
+        self, mu: torch.Tensor, logvar: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Samples from the latent space.
 
@@ -118,7 +120,7 @@ class VAE(nn.Module):
         kl_div = (sigma**2 + mu**2 - torch.log(sigma) - 0.5).sum()
         return z, kl_div
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Forward pass through the VAE.
 
@@ -160,13 +162,13 @@ class GridSearchVAE:
 
     def __init__(
         self,
-        input_image_dims,
-        hidden_layers,
-        latent_dims,
-        lrs,
-        batch_sizes,
+        input_image_dims: Tuple[int, int, int],
+        hidden_layers: List[int],
+        latent_dims: List[int],
+        lrs: List[float],
+        batch_sizes: List[int],
         epochs: int = 10,
-        device="cpu",
+        device: str = "cpu",
     ):
         self.input_image_dims = input_image_dims
         self.latent_dims = latent_dims
@@ -180,7 +182,7 @@ class GridSearchVAE:
         self.results = []
         self.num_combinations = None
 
-    def fit(self, train_dataset, val_dataset):
+    def fit(self, train_dataset, val_dataset) -> None:
         """
         Fits the VAE models with different parameter combinations.
 
@@ -276,7 +278,7 @@ class GridSearchVAE:
                 }
                 self.best_model = model
 
-    def plot_results(self):
+    def plot_results(self) -> None:
         """
         Plots the results of the grid search to identify best model parameters.
         """
@@ -303,17 +305,17 @@ class GridSearchVAE:
 
 class Reshape(nn.Module):
     """
-    Utility module to reshape tensors.
+    Utility module to reshape tensors within a model.
 
     Args:
         *args: Desired shape of the tensor.
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args: int):
         super().__init__()
         self.shape = args
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return x.view(self.shape)
 
 
@@ -334,12 +336,12 @@ class CVAE(nn.Module):
 
     def __init__(
         self,
-        input_image_dims,
-        latent_dims,
-        device,
-        kernel_sizes,
-        filter_sizes,
-        h_dim,
+        input_image_dims: Tuple[int, int, int],
+        latent_dims: int,
+        device: str,
+        kernel_sizes: List[int],
+        filter_sizes: List[int],
+        h_dim: int,
         pool_size: int = 2,
     ):
         super().__init__()
