@@ -237,7 +237,7 @@ To prepare for data assimilation, we first reduce the dimensionality of the data
 
 ### Link to PCA Model
 
-- pca_model_task1.pkl:: https://drive.google.com/file/d/1NIrxykdOnwrUgK8derafOBMk_V4X-IdD/view?usp=sharing
+- pca_model_task1.pkl: https://drive.google.com/file/d/1NIrxykdOnwrUgK8derafOBMk_V4X-IdD/view?usp=sharing
 - pca_model_task2.pkl: https://drive.google.com/file/d/1X0a5AdANofarPWRFKKPwm7t8LafXm4iq/view?usp=sharing
 
 ### Parameters:
@@ -261,7 +261,7 @@ Another method for compressing the data involves using a Convolutional Neural Ne
 
 ### Link to CNN Autoencoder model
 
-https://drive.google.com/file/d/1fj33lBgpLftvUvDI5XqoHOlljzj0ht-E/view?usp=sharingWe use a CNN Autoencoder to perform dimensionality reduction on the data.
+https://drive.google.com/file/d/1fj33lBgpLftvUvDI5XqoHOlljzj0ht-E/view?usp=sharing
 
 ### Key Features of CNN Autoencoder
 
