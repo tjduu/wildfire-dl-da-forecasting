@@ -1,7 +1,7 @@
 Generative Module
 =================
 
-.. automodule:: src.generative
+.. automodule:: atlaswildfiretool.generative
    :members:
    :undoc-members:
    :show-inheritance:
