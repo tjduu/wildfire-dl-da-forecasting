@@ -13,3 +13,4 @@ ipython
 scikit-image
 ipykernel
 black
+opencv-python
