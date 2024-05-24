@@ -1,5 +1,6 @@
 import pytest
-from src.forecasting.model import ConvLSTMCell, ConvLSTM, ImageSequencePredictor
+
+from src.forecasting.model import ConvLSTM, ConvLSTMCell, ImageSequencePredictor
 
 
 def test_model():
