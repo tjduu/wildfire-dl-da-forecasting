@@ -227,7 +227,7 @@ For this section we use a generative AI method to train a wildfire model. We cho
 
 <a name="obj3"></a>
 
-## ⚖️  Data Assimilation
+# ⚖️  Data Assimilation
 
 Perform Data Assimilation with the results of RNN model and  generative model. Data assimilation is performed in a reduced space.
 
