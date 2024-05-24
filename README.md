@@ -397,7 +397,20 @@ The tests do cover the basics, although more robust testing is lacking from the 
 
 ## Documentation
 
-To generate documentation, ...
+To generate documentation:
+```bash
+   pip install sphinx
+```
+After sphinx is installed, in the root directory run:
+```bash
+   make html
+```
+Then, navigate to the html folder and open the html file:
+```bash
+   cd _build/html
+   open index.html
+```
+
 
 <a name="license"></a>
 
