@@ -207,7 +207,7 @@ For this section we use a generative AI method to train a wildfire model. We cho
 <img width="367" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/cf6daf14-ba7c-484b-8f21-879c6a9029bd">
 </div>
 
-`FCVAE_final_training.ipynb` This notebook trains the final model we chose with the entire 17,500 wildfire sequenced images and is run for a total of 100 epochs. WE plot the training loss as well as the original and reconstructed images with their difference (using a custom function) to show how well this model did. The final model used ReLU as the activation with a dip in the MSE() while training due to the learning rate scheduler that was added. Our MSE on training was ```54.648```.
+`FCVAE_final_training.ipynb` This notebook trains the final model we chose with the entire 17,500 wildfire sequenced images and is run for a total of 100 epochs. We plot the training loss as well as the original and reconstructed images with their difference (using a custom function) to show how well this model did. The final model used ReLU as the activation with a dip in the MSE() while training due to the learning rate scheduler that was added. Our MSE on training was ```54.648```.
 
 <div align="center">
 <img width="367" alt="Screenshot 2024-05-24 at 08 02 42" src="https://github.com/ese-msc-2023/acds3-wildfire-atlas/assets/142536668/8d01f2f9-ae80-4f4e-af4d-3d6b325b35b8">
