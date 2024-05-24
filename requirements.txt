@@ -11,3 +11,5 @@ torchvision
 livelossplot
 ipython
 scikit-image
+ipykernel
+black
