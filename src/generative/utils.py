@@ -19,13 +19,23 @@ def get_latent_dim(model):
 
     Args:
         model (nn.Module): The VAE model.
-    
+
     Returns:
         latent_dim (int): The latent dimension of the model.
     """
     return model._mu.out_features
 
-def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_samples=500, pixel_ratio_range=(5, 14), threshold=0.2, num_images=10, print_info=False):
+
+def generate_and_filter_images(
+    autoencoder,
+    obs_dataset,
+    device="cpu",
+    num_samples=500,
+    pixel_ratio_range=(5, 14),
+    threshold=0.2,
+    num_images=10,
+    print_info=False,
+):
     """
     Generate images from random latent vectors and filter them based on pixel ratio criteria.
 
@@ -68,7 +78,7 @@ def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_sampl
     z = torch.randn(num_samples, latent_dim).to(device)
     with torch.no_grad():
         generated_images = autoencoder.decoder(z).cpu().numpy()
-    
+
     # Reshape generated images to 2D
     generated_images = generated_images.reshape((num_samples, 256, 256))
 
@@ -90,7 +100,7 @@ def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_sampl
         pixel_ratio = (active_pixels / total_pixels) * 100
 
         if print_info:
-        # Debugging prints
+            # Debugging prints
             print(f"Generated Image {i + 1}/{num_samples}")
             print(f"Threshold: {threshold}")
             print(f"Total Pixels: {total_pixels}")
@@ -103,14 +113,14 @@ def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_sampl
 
     # Check if filtered images are 0 or not
     if len(filtered_generated_images) == 0:
-        print('No images meet the pixel ratio criteria.')
+        print("No images meet the pixel ratio criteria.")
         return None
 
     total_valid_generated_images = len(filtered_generated_images)
     print(f"Total Valid Generated Images: {total_valid_generated_images}")
 
     # Initialize variables to store the lowest MSE and corresponding images
-    lowest_mse = float('inf')
+    lowest_mse = float("inf")
     highest_ssim = -1
     best_generated_image = None
     best_obs_image = None
@@ -126,7 +136,11 @@ def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_sampl
             # Compute MSE
             mse = mean_squared_error(obs_image, generated_image)
             # Compute SSIM
-            ssim_value = ssim(obs_image, generated_image, data_range=generated_image.max() - generated_image.min())
+            ssim_value = ssim(
+                obs_image,
+                generated_image,
+                data_range=generated_image.max() - generated_image.min(),
+            )
 
             # Update the best image based on combined criteria
             if mse < lowest_mse and ssim_value > highest_ssim:
@@ -135,16 +149,16 @@ def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_sampl
                 best_generated_image = generated_image
                 best_obs_image = obs_image
                 best_obs_index = j
-    
+
     # Plot the best image with the obs image side by side
     fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-    ax[0].imshow(best_generated_image, cmap='viridis')
+    ax[0].imshow(best_generated_image, cmap="viridis")
     ax[0].set_title("Best Generated Image")
-    ax[0].axis('off')
+    ax[0].axis("off")
 
-    ax[1].imshow(best_obs_image, cmap='viridis')
+    ax[1].imshow(best_obs_image, cmap="viridis")
     ax[1].set_title("Best Observation Image")
-    ax[1].axis('off')
+    ax[1].axis("off")
     plt.show()
 
     # Compare filtered images with the best generated image
@@ -152,7 +166,7 @@ def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_sampl
     for generated_image in filtered_generated_images:
         mse = mean_squared_error(best_generated_image, generated_image)
         mse_list.append(mse)
-    
+
     # Get the top 100 images
     top_indices = np.argsort(mse_list)[:num_images]
     top_images = [filtered_generated_images[i] for i in top_indices]
@@ -162,24 +176,32 @@ def generate_and_filter_images(autoencoder, obs_dataset, device='cpu', num_sampl
     images_to_plot = min(num_images, 100)
     num_rows = (images_to_plot + 9) // 10  # Ensure 10 images per row
     fig, ax = plt.subplots(num_rows, 10, figsize=(20, 2 * num_rows))
-    
+
     for i in range(images_to_plot):
         row = i // 10
         col = i % 10
-        ax[row, col].imshow(top_images[i], cmap='viridis')
+        ax[row, col].imshow(top_images[i], cmap="viridis")
         ax[row, col].set_title(f"MSE: {top_mses[i]:.2f}")
-        ax[row, col].axis('off')
-    
+        ax[row, col].axis("off")
+
     # Hide any unused subplots
     for j in range(images_to_plot, num_rows * 10):
         row = j // 10
         col = j % 10
         fig.delaxes(ax[row, col])
-    
+
     plt.tight_layout()
     plt.show()
 
-    return filtered_generated_images, best_generated_image, best_obs_image, best_obs_index, lowest_mse, top_images, top_mses
+    return (
+        filtered_generated_images,
+        best_generated_image,
+        best_obs_image,
+        best_obs_index,
+        lowest_mse,
+        top_images,
+        top_mses,
+    )
 
 
 def get_device():
