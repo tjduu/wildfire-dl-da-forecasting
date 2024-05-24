@@ -107,7 +107,7 @@ Four datasets were used to train the models in this repository:
 ### Visualising the Fire Propagation
 
 <div align="center">
-  <img src="imgs/train_sequence.gif" width="500" />
+  <img src="imgs/train_sequence.gif" width="250" />
 </div>
 
 <hr style="border: none; border-top: 2px solid fire;"/>
