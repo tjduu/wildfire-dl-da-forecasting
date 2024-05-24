@@ -235,76 +235,59 @@ Perform Data Assimilation with the results of RNN model and  generative model. D
 
 To prepare for data assimilation, we first reduce the dimensionality of the data using PCA.
 
-### Train PCA Model
+### Link to PCA Model
 
-We train a PCA model on the provided training data. Important parameters include:
+- pca_model_task1.pkl:: https://drive.google.com/file/d/1NIrxykdOnwrUgK8derafOBMk_V4X-IdD/view?usp=sharing
+- pca_model_task2.pkl: https://drive.google.com/file/d/1X0a5AdANofarPWRFKKPwm7t8LafXm4iq/view?usp=sharing
 
-- `train_path`: Path to the numpy file containing training data.
-- `obs_path`: Path to the numpy file containing observational data.
-- `background_path`: Path to the numpy file containing background data.
-- `n_components`: Number of principal components for PCA. Defaults to 256.
-- `obs_index`: Index of the specific observation from the dataset. Defaults to -1 (last observation).
-- `background_index`: Index of the specific background from the dataset. Defaults to -1 (last background).
+### Parameters:
 
-### PCA Training Example
+- task_1: n_component = 80
+- task_2: n_component = 100
+
+### PCA  Example
 
 ```python
-from atlaswildfiretool.assimilation.train_pca import TrainPCA
+from decompression import PCADecompressor
 
-# Initialize TrainPCA object
-pca_trainer = TrainPCA(
-    train_path='path_to_training_data.npy',
-    obs_path='path_to_observational_data.npy',
-    background_path='path_to_background_data.npy',
-    n_components=256,
-    obs_index=-1,
-    background_index=-1
-)
-
-# Print MSE
-pca_trainer.print_mse()
-
-# Save PCA model
-pca_trainer.save_model('pca_model.pkl')
-
-# Get reduced data
-obs_reduced, background_reduced = pca_trainer.get_reduced_data()
-
-# Decompress data
-obs_decompressed, background_decompressed = pca_trainer.decompress_data()
-
-# Plot images
-pca_trainer.plot_images()
+# Initialize the decompressor
+PCA1 = PCADecompressor('pca_model_task1.pkl')
+PCA2 = PCADecompressor('pca_model_task2.pkl')
 ```
-
-</a>
 
 ## CNN Autoencoder Compression
 
 Another method for compressing the data involves using a Convolutional Neural Network (CNN) Autoencoder.
 
-### Train CNN Autoencoder
+### Link to CNN Autoencoder model
 
-We use a CNN Autoencoder to perform dimensionality reduction on the data. Important parameters include:
-
-- `train_path`: Path to the numpy file containing training data.
-- `test_path`: Path to the numpy file containing test data.
-- `back_path`: Path to the numpy file containing background data.
-- `obs_path`: Path to the numpy file containing observational data.
-- `device`: Device to run the model on (default is 'cpu').
+https://drive.google.com/file/d/1fj33lBgpLftvUvDI5XqoHOlljzj0ht-E/view?usp=sharingWe use a CNN Autoencoder to perform dimensionality reduction on the data.
 
 ### Key Features of CNN Autoencoder
 
 - **Encoder**: Uses convolutional layers with ReLU activation and MaxPooling for downsampling.
 - **Decoder**: Uses transposed convolutional layers with ReLU activation and Sigmoid for upsampling.
 
-#### Training the Model
+### Using example
 
-The model is trained using Mean Squared Error (MSE) loss and the Adam optimizer.
+```python
+train_path = 'Ferguson_fire_train_filtered.npy'
+test_path = 'Ferguson_fire_test.npy'
+back_path = 'Ferguson_fire_background.npy'
+obs_path = 'Ferguson_fire_obs.npy'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-epoch: 200, batch size = 256, learning rate = 0.001
+autoencoder = CNNAutoencoder(train_path, test_path, back_path, obs_path, device)
 
-#### Computing MSE
+# Initialize the decompressor
+c_autoencoder_decompressor = CAEDecompressor(
+    model_obj=autoencoder,
+    model_path='cnn_model.pth',
+    device= device
+)
+```
+
+### Computing MSE
 
 **mse_reduced_before_da**：Difference between generated data and original data in reduced place
 
@@ -397,30 +380,37 @@ da.plot_fixed_predicted_image()
 **Resulting Images**:
 
 ### Original Observation
+
 <div align="left">
 <img src="imgs/original_obs.png" width="200">
 </div>
 
 ### Generated Observation
+
 <div align="left">
 <img src="imgs/generated_obs.png" width="200">
 </div>
 
 ### Assimilated with Convolutional AE
+
 <div align="left">
 <img src="imgs/da_cae.png" width="200">
 </div>
 
 <a name="tests"></a>
+
 ## Testing
 
 This repository includes several tests, which you can use to check its operation on your system. When you are in the 'atlas' environment, the tests can be run by entering this code in terminal:
+
 ```
 python -m pytest atlaswildfiretool/tests
 ```
+
 The tests do cover the basics, although more robust testing is lacking from the current set up, and something that can be improved upon in the future.
 
 <a name="docs"></a>
+
 ## Documentation
 
 To generate documentation, ...
