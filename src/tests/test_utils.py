@@ -15,10 +15,12 @@ sequential_undersample_3d_arr
 
 """
 
-#TODO: do this.
+
+# TODO: do this.
 def test_sequential_train_val_split():
     pass
 
-#TODO: do this.
+
+# TODO: do this.
 def test_sequential_undersample_3d_arr():
     pass

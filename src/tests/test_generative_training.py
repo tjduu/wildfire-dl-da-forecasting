@@ -1,4 +1,3 @@
-
 # import pytest
 # from unittest.mock import patch, MagicMock
 
@@ -18,7 +17,7 @@
 #     model, optimizer, scheduler, train_loader, val_loader = setup_model
 #     n_epochs = 5
 #     device = "cpu"
-    
+
 #     with patch('src.generative.training.train') as mock_train, \
 #          patch('src.generative.training.validate') as mock_validate:
 #         train_vae(
@@ -36,7 +35,7 @@
 #         # Check train and validate are called n_epochs times
 #         assert mock_train.call_count == n_epochs
 #         assert mock_validate.call_count == n_epochs
-        
+
 #         mock_train.assert_called_with(
 #             model=model,
 #             optimizer=optimizer,
