@@ -377,8 +377,8 @@ da.plot_fixed_predicted_image()
 
 **Resulting Images**:
 
-<div align="center">
-<img src="imgs/pca.png" width="367">
+<div align="left">
+<img src="imgs/pca.png" width="500">
 </div>
 
 **Mean Squared Error (MSE)** using CAE:
